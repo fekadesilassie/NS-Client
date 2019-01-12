@@ -8365,4 +8365,1686 @@ getSublistFieldStateForInstance(sublistId,fieldId,lineInstanceId,useBuffer).useT
 this.doSetSublistValueForInstance=doSetSublistValueForInstance;function getSetFieldMetadata(sublistId,fieldId)
 {return{isValidField:isValidField(sublistId,fieldId),isMultiSelect:isFieldMultiSelect(sublistId,fieldId),isSelect:isFieldSelectType(sublistId,fieldId),isRadio:isFieldRadio(sublistId,fieldId),isNumeric:isFieldNumeric(sublistId,fieldId),isCurrency:isFieldCurrency(sublistId,fieldId),type:getFieldType(sublistId,fieldId)};}
 this.getSetFieldMetadata=getSetFieldMetadata;function getSublistText(options,fieldId,line)
-{var sublistId;i
+{var sublistId;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],getMissingArgumentErrorMessageFillerValue('getSublistText'));return doGetSublistText(sublistId,fieldId,line);}
+this.getSublistText=getSublistText;function doGetSublistText(sublistId,fieldId,line)
+{var useBuffer=false;var fieldState=getSublistFieldState(sublistId,fieldId,line,useBuffer);validateTextApi(true,fieldState,'setSublistValue','getSublistValue');validateLineIndex_MLB(line,sublistId,false);var value=undef;if(line>=0)
+{var lineInstanceId=getLineInstanceId(sublistId,line,useBuffer);var lineDefinitionObject=getLineObjectFromCache(sublistId,lineInstanceId,useBuffer);value=lineDefinitionObject.doGetText(fieldId);}
+return value;}
+function doGetSublistTextForInstance(sublistId,fieldId,lineInstanceId,useBuffer,delegator)
+{return implementation.doGetSublistTextForInstance(sublistId,fieldId,lineInstanceId,useBuffer,delegator);}
+this.doGetSublistTextForInstance=doGetSublistTextForInstance;function setSublistText(options,fieldId,line,text)
+{implementation.setSublistText(options,fieldId,line,text);}
+this.setSublistText=recordDefinitionEvent.wrapEmitError({record:that,func:setSublistText,emitter:emitter});function doSetSublistTextForInstance(sublistId,fieldId,lineInstanceId,text,fireFieldChange,noSlaving,isUpdatingSlavingField,useBuffer,isInteractive)
+{if(useBuffer)
+{var metadata={isMultiSelect:isFieldMultiSelect(sublistId,fieldId),isSelect:isFieldSelectType(sublistId,fieldId),isRadio:isFieldRadio(sublistId,fieldId),radioSet:getRadioSet(fieldId),isValidField:isValidField(sublistId,fieldId)};var value=recordBehaviorDelegateService.convertTextToValueForSetText(that,sublistId,fieldId,lineInstanceId,text,metadata,useBuffer);if(metadata.isMultiSelect||metadata.isSelect||metadata.isRadio)
+{doSetSublistBufferFieldValue(sublistId,fieldId,lineInstanceId,value,fireFieldChange,noSlaving,metadata.isRadio,isUpdatingSlavingField,useBuffer);}
+else
+{doSetSublistValueForInstance(sublistId,fieldId,lineInstanceId,value,fireFieldChange,useBuffer,isInteractive);}}
+else
+{finishSetSublistValueForInstance(sublistId,fieldId,lineInstanceId,text,useBuffer);}
+getSublistFieldStateForInstance(sublistId,fieldId,lineInstanceId,useBuffer).useTextApi=true;}
+this.doSetSublistTextForInstance=doSetSublistTextForInstance;function getLineCount(options)
+{var sublistId=recordUtil.handleOverloadingMethodsForSingleArgument(options,'sublistId',getMissingArgumentErrorMessageFillerValue('getLineCount'));return doGetLineCount(sublistId);}
+this.getLineCount=getLineCount;function doGetLineCount(sublistId)
+{return isSublistValid(sublistId)?getModelController().getSublistLineCount(sublistId):-1;}
+this.doGetLineCount=doGetLineCount;function insertLine(options,line)
+{var sublistId,beforeLineInstanceId,lineObj,ignoreRecalc=false;if(line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;line=options.line;beforeLineInstanceId=options.beforeLineInstanceId;ignoreRecalc=options.ignoreRecalc||false;}
+if(isMultilineEditable(sublistId))
+{return insertLine_MLB(sublistId,line,beforeLineInstanceId,ignoreRecalc);}
+utilityFunctions.checkMutuallyExclusiveArguments(line,beforeLineInstanceId,'line','beforeLineInstanceId');recordUtil.assertValidSublistOperation(isSublistAnEditMachine(sublistId));if(line!==undef)
+{utilityFunctions.checkArgs([sublistId,line],['sublistId','line'],getMissingArgumentErrorMessageFillerValue('insertLine'));lineObj=doInsertLine(sublistId,line,ignoreRecalc);}
+else
+{utilityFunctions.checkArgs([sublistId,beforeLineInstanceId],['sublistId','beforeLineInstanceId'],getMissingArgumentErrorMessageFillerValue('insertLine'));lineObj=doInsertLineForInstance(sublistId,beforeLineInstanceId,ignoreRecalc);}
+return!lineObj?null:lineObj.proxy();}
+function insertLine_MLB(sublistId,line,beforeLineInstanceId,ignoreRecalc)
+{var lineObj;utilityFunctions.checkMutuallyExclusiveArguments(line,beforeLineInstanceId,'line','beforeLineInstanceId');recordUtil.assertValidSublistOperation(isSublistAnEditMachine(sublistId));if(beforeLineInstanceId===undef)
+{beforeLineInstanceId=getModelController().getSpecifiedLineInstanceIdByIndex(sublistId,line);}
+utilityFunctions.checkArgs([sublistId,beforeLineInstanceId],['sublistId','beforeLineInstanceId'],getMissingArgumentErrorMessageFillerValue('insertLine'));lineObj=doInsertLineForInstance(sublistId,beforeLineInstanceId,ignoreRecalc);return!lineObj?null:lineObj.proxy();}
+this.insertLine=recordDefinitionEvent.wrapEmitError({record:that,func:insertLine,emitter:emitter});function doInsertLine(sublistId,line,ignoreRecalc)
+{var useBuffer=false;var lineInstanceId=null;if(ignoreRecalc===undef)
+{ignoreRecalc=false;}
+if(isSublistAnEditMachine(sublistId))
+{validateLineIndex_MLB(line,sublistId,true);preInsertLine(sublistId,line);insertSublistLine(sublistId,line);postInsertLine(sublistId,line,ignoreRecalc);setSublistIsChanged(sublistId,true);if(!!getLineInstanceId(sublistId,line,true))
+{useBuffer=true;}}
+else
+{useBuffer=false;}
+lineInstanceId=getLineInstanceId(sublistId,line,useBuffer);return getLineObjectFromCache(sublistId,lineInstanceId,useBuffer);}
+this.doInsertLine=doInsertLine;function doInsertLineForInstance(sublistId,beforeLineInstanceId,ignoreRecalc)
+{var lineObj=null;if(ignoreRecalc===undef)
+{ignoreRecalc=false;}
+if(isSublistAnEditMachine(sublistId))
+{var useBuffer=isMultilineEditable(sublistId);validateLineInstanceId(sublistId,beforeLineInstanceId,useBuffer,isMultilineEditable(sublistId));preInsertLineForInstance(sublistId,beforeLineInstanceId);var lineInstanceId=insertSublistLineForInstance(sublistId,beforeLineInstanceId);postInsertLineForInstance(sublistId,lineInstanceId,ignoreRecalc);setSublistIsChanged(sublistId,true);lineObj=getLineObjectFromCache(sublistId,lineInstanceId,useBuffer);}
+return lineObj;}
+this.doInsertLineForInstance=doInsertLineForInstance;function insertSublistLine(sublistId,line)
+{getModelController().insertSublistLine(sublistId,line);getSublistState(sublistId).insertLine(line,true);subrecord_updateFieldState(true);}
+function insertSublistLineForInstance(sublistId,beforeLineInstanceId)
+{var useBuffer=true;var lineInstanceId=getModelController().insertSublistLineForInstance(sublistId,beforeLineInstanceId,isMultilineEditable(sublistId));getSublistState(sublistId).insertLineForInstance(lineInstanceId,useBuffer,true);subrecord_updateFieldState(true);return lineInstanceId;}
+function preInsertLine(sublistId,line)
+{implementation.preInsertLine(sublistId,line);}
+function preInsertLineForInstance(sublistId,beforeLineInstanceId)
+{implementation.preInsertLineForInstance(sublistId,beforeLineInstanceId);}
+function postInsertLine(sublistId,line,ignoreRecalc)
+{return implementation.postInsertLine(sublistId,line,ignoreRecalc);}
+function postInsertLineForInstance(sublistId,beforeLineInstanceId,ignoreRecalc)
+{return implementation.postInsertLineForInstance(sublistId,beforeLineInstanceId,ignoreRecalc);}
+function makeCopyForInstance(sublistId,lineInstanceId,useBuffer)
+{var lineToCopy=getModelController().getSublistLineForInstance(sublistId,lineInstanceId,useBuffer);var noCopyToDefaultMap=getNoCopyToDefaultMapForSublist(sublistId);var newLineId=getModelController().makeCopyForInstance(sublistId,lineToCopy,isMultilineEditable(sublistId),noCopyToDefaultMap);var fromBuffer=true;var copiedLine=getLineObjectFromCache(sublistId,newLineId,fromBuffer);return!copiedLine?null:copiedLine.proxy();}
+this.makeCopyForInstance=makeCopyForInstance;function copyLine(options)
+{var useBuffer=false;var sublistId=recordUtil.handleOverloadingMethodsForSingleArgument(options,'sublistId',getMissingArgumentErrorMessageFillerValue("copyLine"));var currIdx=doGetCurrentSublistIndex(sublistId);var currInstanceId=getLineInstanceId(sublistId,currIdx,useBuffer);var returnMe;recordUtil.assertValidSublistOperation(isSublistAnEditMachine(sublistId)&&(currInstanceId!=null));if(isMultilineEditable(sublistId))
+{returnMe=makeCopyForInstance(sublistId,currInstanceId,useBuffer)}
+else
+{commitLine(options);var lineToCopy=getModelController().getSublistLineForInstance(sublistId,currInstanceId,useBuffer);var noCopyToDefaultMap=getNoCopyToDefaultMapForSublist(sublistId);var newLineId=getModelController().updateNewLineBufferWithCopy(sublistId,lineToCopy,noCopyToDefaultMap);returnMe=undef;}
+return returnMe;}
+this.copyLine=recordDefinitionEvent.wrapEmitError({record:that,func:copyLine,emitter:emitter});function doResetSublistLine(sublistId,line,data)
+{getModelController().resetSublistLine(sublistId,line,data);}
+this.doResetSublistLine=doResetSublistLine;function doResetSublistLineForInstance(sublistId,lineInstanceId,data)
+{var useBuffer=true;getModelController().resetSublistLineForInstance(sublistId,lineInstanceId,data,useBuffer);}
+this.doResetSublistLineForInstance=doResetSublistLineForInstance;function removeLine(options,line)
+{var sublistId,lineInstanceId,ignoreRecalc=false;if(line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;line=options.line;lineInstanceId=options.lineInstanceId;ignoreRecalc=options.ignoreRecalc||false;}
+utilityFunctions.checkMutuallyExclusiveArguments(line,lineInstanceId,'line','lineInstanceId');recordUtil.assertValidSublistOperation(isSublistAnEditMachine(sublistId));if(isMultilineEditable(sublistId))
+{if(line!==undef)
+lineInstanceId=getLineInstanceId(sublistId,line,false);doRemoveLineForInstance(sublistId,lineInstanceId,ignoreRecalc);}
+else if(line!==undef)
+{utilityFunctions.checkArgs([sublistId,line],['sublistId','line'],getMissingArgumentErrorMessageFillerValue('removeLine'));doRemoveLine(sublistId,line,ignoreRecalc);}
+else
+{utilityFunctions.checkArgs([sublistId,lineInstanceId],['sublistId','lineInstanceId'],getMissingArgumentErrorMessageFillerValue('removeLine'));doRemoveLineForInstance(sublistId,lineInstanceId,ignoreRecalc);}}
+this.removeLine=recordDefinitionEvent.wrapEmitError({record:that,func:removeLine,emitter:emitter});function doRemoveLine(sublistId,line,ignoreRecalc)
+{if(isSublistAnEditMachine(sublistId))
+{validateLineIndex_MLB(line,sublistId,false);var lastLineIndex=isMultilineEditable(sublistId)?getModelController().getNextNewLineIndex_MLB(sublistId)-1:doGetLineCount(sublistId)-1;var isLastLine=line===lastLineIndex;removeSublistLine(sublistId,line,ignoreRecalc);getSublistState(sublistId).removeLine(line);postRemoveLine(sublistId,line,isLastLine);setSublistIsChanged(sublistId,true);}}
+this.doRemoveLine=doRemoveLine;function doRemoveLineForInstance(sublistId,lineInstanceId,ignoreRecalc)
+{if(isSublistAnEditMachine(sublistId))
+{var useBuffer=false;validateLineInstanceId(sublistId,lineInstanceId,useBuffer);removeSublistLineForInstance(sublistId,lineInstanceId,ignoreRecalc);getSublistState(sublistId).removeLineForInstance(lineInstanceId);postRemoveLineForInstance(sublistId,lineInstanceId,useBuffer);setSublistIsChanged(sublistId,true);}}
+function removeSublistLine(sublistId,line,ignoreRecalc)
+{implementation.removeSublistLine(sublistId,line,ignoreRecalc);}
+function removeSublistLineForInstance(sublistId,lineInstanceId,ignoreRecalc)
+{implementation.removeSublistLineForInstance(sublistId,lineInstanceId,ignoreRecalc);}
+function doRemoveSublistLine(sublistId,line)
+{var lineInstanceId=getModelController().removeSublistLine(sublistId,line);subrecord_updateFieldState(true);removeLineObjectFromCache(sublistId,lineInstanceId);return lineInstanceId;}
+this.doRemoveSublistLine=doRemoveSublistLine;function doRemoveSublistLineForInstance(sublistId,lineInstanceId)
+{getModelController().removeSublistLineForInstance(sublistId,lineInstanceId);subrecord_updateFieldState(true);removeLineObjectFromCache(sublistId,lineInstanceId);return lineInstanceId;}
+this.doRemoveSublistLineForInstance=doRemoveSublistLineForInstance;function postRemoveLine(sublistId,line,isLastLine)
+{implementation.postRemoveLine(sublistId,line,isLastLine,isMultilineEditable(sublistId));}
+function postRemoveLineForInstance(sublistId,lineInstanceId,useBuffer)
+{implementation.postRemoveLineForInstance(sublistId,lineInstanceId,useBuffer);}
+function getCurrentSublistIndex(options)
+{var sublistId;sublistId=options!==undef&&options!==null&&!util.isString(options)?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],getMissingArgumentErrorMessageFillerValue('getCurrentSublistIndex'));return doGetCurrentSublistIndex(sublistId);}
+this.getCurrentSublistIndex=getCurrentSublistIndex;function doGetCurrentSublistIndex(sublistId)
+{return getModelController().getCurrentSublistLineIndex(sublistId);}
+this.doGetCurrentSublistIndex=doGetCurrentSublistIndex;function doGetCurrentSublistLineInstanceId(sublistId)
+{return getModelController().getSublistSelectedLineInstanceId(sublistId);}
+this.doGetCurrentSublistLineInstanceId=doGetCurrentSublistLineInstanceId;function selectLine(options,line)
+{var lineObj=implementation.selectLine(options,line);return!lineObj?null:lineObj.proxy();}
+this.selectLine=recordDefinitionEvent.wrapEmitError({record:that,func:selectLine,emitter:emitter});function doSelectLine(sublistId,line)
+{var lineInstanceId;if(line===doGetCurrentSublistIndex(sublistId))
+{lineInstanceId=getModelController().getSublistSelectedLineInstanceId(sublistId);}
+else
+{validateLineIndex_MLB(line,sublistId,false);if(isMultilineEditable(sublistId)&&getModelController().lineIndexIsNewLine_MLB(sublistId,line))
+{lineInstanceId=getModelController().updateCurrentLineToANewLine_MLB(sublistId,line);}
+else
+{lineInstanceId=handleSelectSublistLine(sublistId,line);triggerLineInitScript(sublistId);}}
+return getLineObjectFromCache(sublistId,lineInstanceId,true);}
+this.doSelectLine=doSelectLine;function doSelectLineForInstance(sublistId,lineInstanceId)
+{return doSelectLine(sublistId,getLineIndexFromInstanceId(sublistId,lineInstanceId,true));}
+this.doSelectLineForInstance=doSelectLineForInstance;function handleSelectSublistLine(sublistId,line)
+{var lineInstanceId=getModelController().selectSublistLine(sublistId,line,isMultilineEditable(sublistId));getSublistState(sublistId).resetCurrentLineState(line);subrecord_updateFieldState(true);return lineInstanceId;}
+function handleSelectSublistLineForInstance(sublistId,lineInstanceId)
+{var useBuffer=true;var resultLineInstanceId=getModelController().selectSublistLineForInstance(sublistId,lineInstanceId,isMultilineEditable(sublistId));var line=getModelController().getSublistLineValueForInstance(sublistId,'_sequence',resultLineInstanceId,useBuffer);getSublistState(sublistId).resetCurrentLineState(line);subrecord_updateFieldState(true);return resultLineInstanceId;}
+function selectNewLine(options)
+{var lineObj=implementation.selectNewLine(options);return!lineObj?null:lineObj.proxy();}
+this.selectNewLine=recordDefinitionEvent.wrapEmitError({record:that,func:selectNewLine,emitter:emitter});function doSelectNewLine(sublistId,ignoreLineInit)
+{ignoreLineInit=ignoreLineInit||false;var lineObj=null;if(isSublistAnEditMachine(sublistId))
+{if(isMultilineEditable(sublistId))
+{lineObj=doAddNewLine(sublistId);getModelController().updateCurrentLineToANewLine_MLB(sublistId,lineObj.sequence);}
+else
+{var lineInstanceId=handleSelectNewSublistLine(sublistId);if(!ignoreLineInit)
+{triggerLineInitScript(sublistId);}
+lineObj=getLineObjectFromCache(sublistId,lineInstanceId,true);}}
+return lineObj;}
+this.doSelectNewLine=doSelectNewLine;function handleSelectNewSublistLine(sublistId)
+{var lineInstanceId=getModelController().selectNewSublistLine(sublistId,_metadata.getSublistDefaultValue(sublistId));getSublistState(sublistId).resetCurrentLineState(doGetLineCount(sublistId));subrecord_updateFieldState(true);return lineInstanceId;}
+function validateGetLineOperation(sublistId,isCommitted)
+{utilityFunctions.assertTrue(isSublistValid(sublistId),error.Type.INVALID_SUBLIST_OPERATION);utilityFunctions.assertTrue(isCommitted||getIsDynamicRecord(),error.Type.INVALID_SUBLIST_OPERATION);}
+function getLine(options)
+{var sublistId;var lineInstanceId;var isCommitted;if(options!==undef&&options!==null)
+{sublistId=options.sublistId;lineInstanceId=options.lineInstanceId;isCommitted=util.isBoolean(options.isCommitted)?options.isCommitted:false;}
+utilityFunctions.checkArgs([sublistId,lineInstanceId],['sublistId','lineInstanceId'],getMissingArgumentErrorMessageFillerValue('getLine'));validateGetLineOperation(sublistId,isCommitted);var useBuffer=!isCommitted;var allowFallback=true;var lineExists=getModelController().isSublistLineInstanceIdValid(sublistId,lineInstanceId,useBuffer,allowFallback);if(!lineExists)
+{utilityFunctions.throwSuiteScriptError(error.Type.SSS_INVALID_SUBLIST_OPERATION);}
+var lineObj=getLineObjectFromCache(sublistId,lineInstanceId,useBuffer);return!lineObj?null:lineObj.proxy();}
+this.getLine=recordDefinitionEvent.wrapEmitError({record:that,func:getLine,emitter:emitter});function getLinesIterator(options)
+{var sublistId;var isCommitted;if(options!==undef&&options!==null)
+{sublistId=options.sublistId;isCommitted=util.isBoolean(options.isCommitted)?options.isCommitted:false;}
+utilityFunctions.checkArgs([sublistId],['sublistId'],getMissingArgumentErrorMessageFillerValue('getLinesIterator'));validateGetLineOperation(sublistId,isCommitted);var useBuffer=!isCommitted;var result={each:function(func)
+{var instanceIds=getModelController().getSublistLineInstanceIds(sublistId,isCommitted);instanceIds.forEach(function(lineInstanceId){var lineObj=getLineObjectFromCache(sublistId,lineInstanceId,useBuffer);func(lineObj.proxy());})},next:(function()
+{var index=0;var done=false;var instanceIds=getModelController().getSublistLineInstanceIds(sublistId,isCommitted);return function()
+{var lineInstanceId,lineObj;var result={done:done};if(!done)
+{done=!(index<instanceIds.length);if(!done)
+{lineInstanceId=instanceIds[index];lineObj=getLineObjectFromCache(sublistId,lineInstanceId,useBuffer);index+=1;result.value=lineObj.proxy();}}
+result.done=done;return result;};})()};return Object.freeze(result);}
+this.getLinesIterator=recordDefinitionEvent.wrapEmitError({record:that,func:getLinesIterator,emitter:emitter});function getLines(options){var sublistId;var orderBy;var fieldId;var modelController=getModelController();var isCommitted;function sortByTextOneLevel(line1,line2){var val1=line1.getText(fieldId);var val2=line2.getText(fieldId);return((val1===val2)?0:((val1>val2)?1:-1));}
+function isCheckboxOrSelect(fieldId){return isFieldSelectType(sublistId,fieldId)||isFieldCheckbox(sublistId,fieldId);}
+if(options!==undef&&options!==null){sublistId=options.sublistId;orderBy=options.orderBy;isCommitted=util.isBoolean(options.isCommitted)?options.isCommitted:false;}
+if(!getIsReadOnlyRecord()&&orderBy!==undef&&orderBy!==null){utilityFunctions.throwSuiteScriptError(error.Type.SSS_UNSUPPORTED_METHOD);}
+validateGetLineOperation(sublistId,isCommitted);utilityFunctions.checkArgs([sublistId],['sublistId'],getMissingArgumentErrorMessageFillerValue('getLines'));var sortedLineInstanceIds=modelController.getSublistLineInstanceIds(sublistId,isCommitted);var sortedLines=sortedLineInstanceIds.map(function(lineInstanceId){var lineObj=getLineObjectFromCache(sublistId,lineInstanceId,!isCommitted);return!lineObj?null:lineObj.proxy();});if(orderBy!==undef&&orderBy!==null){if(util.isString(orderBy)){fieldId=orderBy;if(isCheckboxOrSelect(fieldId)){sortedLines.sort(sortByTextOneLevel);}}else if(util.isArray(orderBy)&&orderBy.length==1){var fieldObject;var ascending;fieldObject=orderBy[0];fieldId=fieldObject.fieldId;ascending=fieldObject.ascending;if(ascending!==undef&&ascending!==null&&!util.isBoolean(ascending)){utilityFunctions.throwSuiteScriptError(error.Type.YOU_HAVE_ATTEMPTED_AN_UNSUPPORTED_ACTION);}
+if(isCheckboxOrSelect(fieldId)){sortedLines.sort(sortByTextOneLevel);if(ascending===false){sortedLines.reverse();}}}else{utilityFunctions.throwSuiteScriptError(error.Type.YOU_HAVE_ATTEMPTED_AN_UNSUPPORTED_ACTION);}}
+return sortedLines;}
+this.getLines=recordDefinitionEvent.wrapEmitError({record:that,func:getLines,emitter:emitter});function doAddNewLine(sublistId)
+{var useBuffer=true;var lineObj=null;if(!isMultilineEditable(sublistId))
+utilityFunctions.throwSuiteScriptError(error.Type.SSS_UNSUPPORTED_METHOD);if(isSublistAnEditMachine(sublistId))
+{var lineInstanceId=getModelController().addNewSublistLine(sublistId,_metadata.getSublistDefaultValue(sublistId));getSublistState(sublistId).resetBufferLineStateForInstance(lineInstanceId,useBuffer);getModelController().runFunctionWhileSilentlySelectingLine(sublistId,lineInstanceId,triggerLineInitScript,implementation,[sublistId]);lineObj=getLineObjectFromCache(sublistId,lineInstanceId,useBuffer);}
+return lineObj;}
+this.doAddNewLine=doAddNewLine;function addNewLine(options)
+{var lineObj=implementation.addNewLine(options);return!lineObj?null:lineObj.proxy();}
+this.addNewLine=recordDefinitionEvent.wrapEmitError({record:that,func:addNewLine,emitter:emitter});function cancelLine(options)
+{implementation.cancelLine(options);}
+this.cancelLine=recordDefinitionEvent.wrapEmitError({record:that,func:cancelLine,emitter:emitter});function doCancelLine(sublistId)
+{if(isSublistAnEditMachine(sublistId))
+{var line=doGetCurrentSublistIndex(sublistId);validateLineIndex_MLB(line,sublistId,true);var lineInstanceId=getModelController().getSublistSelectedLineInstanceId(sublistId);doCancelLineForInstance(sublistId,lineInstanceId);if(!isMultilineEditable(sublistId))
+{postCancelLine(sublistId,line);}}}
+this.doCancelLine=doCancelLine;function cancelLineForInstance(sublistId,lineInstanceId)
+{implementation.cancelLineForInstance(sublistId,lineInstanceId);}
+this.cancelLineForInstance=cancelLineForInstance;function doCancelLineForInstance(sublistId,lineInstanceId)
+{if(isSublistAnEditMachine(sublistId))
+{var useBuffer=true;dereferencedSublistLineSubrecords(sublistId,lineInstanceId,useBuffer);getSublistState(sublistId).removeCurrentLineState();getModelController().cancelCurrentSublistLine(sublistId);subrecord_updateFieldState(true);}}
+this.doCancelLineForInstance=doCancelLineForInstance;function postCancelLine(sublistId,line)
+{var lineObj=null;if(line<doGetLineCount(sublistId))
+{lineObj=doSelectLine(sublistId,line);}
+else
+{lineObj=doSelectNewLine(sublistId);}
+return lineObj;}
+function commitLine(options)
+{implementation.commitLine(options);}
+function commitLinePromise(delegate,args,proxyOptions)
+{return new Promise(function(resolve,reject)
+{try
+{implementation.commitLine(args[0]);resolve(delegate.proxy(proxyOptions));}
+catch(e)
+{reject(e);}});}
+this.commitLine=recordDefinitionEvent.wrapEmitError({record:that,func:commitLine,emitter:emitter});this.commitLine.promise=recordDefinitionEvent.wrapEmitError({record:that,func:commitLinePromise,emitter:emitter});function doCommitLine(sublistId,ignoreRecalc)
+{if(isSublistEditable(sublistId))
+{var line=doGetCurrentSublistIndex(sublistId);validateLineIndex_MLB(line,sublistId,true);var lineInstanceId=getModelController().getSublistSelectedLineInstanceId(sublistId);doCommitLineForInstance(sublistId,lineInstanceId,ignoreRecalc);if(isSublistAnEditMachine(sublistId)&&!isMultilineEditable(sublistId))
+{doSelectNewLine(sublistId);}}}
+this.doCommitLine=doCommitLine;function commitLineForInstance(sublistId,lineInstanceId)
+{implementation.commitLineForInstance(sublistId,lineInstanceId);}
+this.commitLineForInstance=commitLineForInstance;function doCommitLineForInstance(sublistId,lineInstanceId,ignoreRecalc)
+{if(isSublistEditable(sublistId))
+{var useBuffer=true;triggerValidateLineScript(sublistId);getModelController().validateCurrentSublistSubrecordsForInstance(sublistId,lineInstanceId);getSublistState(sublistId).commitLineForInstance(lineInstanceId);getModelController().commitSublistLineForInstance(sublistId,lineInstanceId);subrecord_updateFieldState(true);if(!ignoreRecalc)
+{triggerRecalcScript(sublistId,false,'commit');}
+if(isSublistAnEditMachine(sublistId))
+{triggerLineCommitScriptForInstance(sublistId,lineInstanceId,useBuffer);}}}
+this.doCommitLineForInstance=doCommitLineForInstance;function constructLineObject(sublistId,lineInstanceId,useBuffer)
+{var lineObj;var lineOptions={unproxiedRecord:that,sublistId:sublistId,lineInstanceId:lineInstanceId,fromBuffer:useBuffer,isReadOnly:getIsReadOnlyRecord()||(getIsDynamicRecord()&&!useBuffer)};lineObj=new lineDefinition(lineOptions);return lineObj;}
+function constructPostSetObject(sublistId,fieldId,dbValue,fireFieldChange,noSlaving,isUpdatingSlavingField)
+{return{sublistId:sublistId,fieldId:fieldId,dbValue:dbValue,fireFieldChange:fireFieldChange,noSlaving:noSlaving,isUpdatingSlavingField:isUpdatingSlavingField};}
+function getCurrentSublistValue(options,fieldId)
+{return implementation.getCurrentSublistValue(options,fieldId);}
+this.getCurrentSublistValue=getCurrentSublistValue;function doGetCurrentSublistValue(sublistId,fieldId)
+{var hasFieldExisted=hasCurrentSublistFieldValueOrSublistFieldExisted(sublistId,fieldId);var value=!hasFieldExisted?undef:getModelController().getCurrentSublistLineValue(sublistId,fieldId);var metadata={hasFieldExisted:hasFieldExisted,isMultiSelect:isFieldMultiSelect(sublistId,fieldId)};return recordBehaviorDelegateService.handleMultiSelectAndVirtualFieldForReturnValue(value,metadata);}
+function setCurrentSublistValue(options,fieldId,value,isInteractive)
+{implementation.setCurrentSublistValue(options,fieldId,value,isInteractive);}
+function setSublistBufferValue(options)
+{implementation.setSublistBufferValue(options);}
+this.setSublistBufferValue=recordDefinitionEvent.wrapEmitError({record:that,func:setSublistBufferValue,emitter:emitter});this.setCurrentSublistValue=recordDefinitionEvent.wrapEmitError({record:that,func:setCurrentSublistValue,emitter:emitter});function doSetCurrentSublistValue(sublistId,fieldId,value,fireFieldChange,noSlaving,isInteractive)
+{var lineInstanceId=getModelController().getSublistSelectedLineInstanceId(sublistId);doSetSublistBufferValue(sublistId,fieldId,lineInstanceId,value,fireFieldChange,noSlaving,isInteractive);}
+this.doSetCurrentSublistValue=doSetCurrentSublistValue;function doSetSublistBufferValue(sublistId,fieldId,lineInstanceId,value,fireFieldChange,noSlaving,isInteractive)
+{var useBuffer=true;validateIfSublistIdEditableAndInstanceIdValid(sublistId,lineInstanceId,useBuffer);var relevantMetadata={sublistId:sublistId,fieldId:fieldId,isMultiSelect:isFieldMultiSelect(sublistId,fieldId),isRadio:isFieldRadio(sublistId,fieldId),isInteractive:isInteractive};var validatedValue=recordBehaviorDelegateService.preDoSetSublistBufferValue(that,lineInstanceId,value,relevantMetadata);var valueIsFormattedAsString=false;var isUpdatingSlavingField=false;doSetSublistBufferFieldValue(sublistId,fieldId,lineInstanceId,validatedValue,fireFieldChange,noSlaving,valueIsFormattedAsString,isUpdatingSlavingField,useBuffer);}
+this.doSetSublistBufferValue=doSetSublistBufferValue;function validateIfSublistIdEditableAndInstanceIdValid(sublistId,instanceId,useBuffer)
+{var sublistMetadata=getSublistMetadata(sublistId);recordUtil.assertValidSublistOperation(sublistMetadata!==null);if(sublistMetadata.displayOnly)
+{utilityFunctions.throwSuiteScriptError(error.Type.INVALID_SCRIPT_OPERATION_ON_READONLY_SUBLIST_FIELD,sublistId);}
+var allowFallback=true;validateLineInstanceId(sublistId,instanceId,useBuffer,allowFallback);}
+this.validateIfSublistIdEditableAndInstanceIdValid=validateIfSublistIdEditableAndInstanceIdValid;function doSetCurrentSublistFieldValue(sublistId,fieldId,value,fireFieldChange,noSlaving,valueIsFormattedAsString,isUpdatingSlavingField)
+{var useBuffer=true;var lineInstanceId=getModelController().getSublistSelectedLineInstanceId(sublistId);doSetSublistBufferFieldValue(sublistId,fieldId,lineInstanceId,value,fireFieldChange,noSlaving,valueIsFormattedAsString,isUpdatingSlavingField,useBuffer);}
+this.doSetCurrentSublistFieldValue=doSetCurrentSublistFieldValue;function doSetSublistBufferFieldValue(sublistId,fieldId,lineInstanceId,value,fireFieldChange,noSlaving,valueIsFormattedAsString,isUpdatingSlavingField,useBuffer)
+{var relevantMetadata=getSetFieldMetadata(sublistId,fieldId);relevantMetadata.valueIsFormattedAsString=valueIsFormattedAsString;var valueObject=recordBehaviorDelegateService.createObjectToDoSetValue(value,relevantMetadata);getModelController().setSublistLineValueForInstance(sublistId,fieldId,lineInstanceId,valueObject,useBuffer);var postSetObject=constructPostSetObject(sublistId,fieldId,valueObject.legacyStringValue,fireFieldChange,noSlaving,isUpdatingSlavingField);var fieldState=getSublistFieldStateForInstance(sublistId,fieldId,lineInstanceId,useBuffer);fieldState.isParsed=!valueIsFormattedAsString;fieldState.isChanged=true;recordBehaviorDelegateService.postDoSetValueForInstance(that,postSetObject,lineInstanceId,useBuffer);}
+this.doSetSublistBufferFieldValue=doSetSublistBufferFieldValue;function getCurrentSublistText(options,fieldId)
+{return implementation.getCurrentSublistText(options,fieldId);}
+this.getCurrentSublistText=getCurrentSublistText;function setCurrentSublistText(options,fieldId,text,isInteractive)
+{implementation.setCurrentSublistText(options,fieldId,text,isInteractive);}
+this.setCurrentSublistText=recordDefinitionEvent.wrapEmitError({record:that,func:setCurrentSublistText,emitter:emitter});function doSetCurrentSublistText(sublistId,fieldId,text,fireFieldChange,noSlaving,isUpdatingSlaveField,isInteractive)
+{var useBuffer=true;var lineInstanceId=getModelController().getSublistSelectedLineInstanceId(sublistId);doSetSublistTextForInstance(sublistId,fieldId,lineInstanceId,text,fireFieldChange,noSlaving,isUpdatingSlaveField,useBuffer,isInteractive);}
+this.doSetCurrentSublistText=doSetCurrentSublistText;function overwriteSublistState(clonedSublistState,sourceSublistState)
+{clonedSublistState.isDisplay=sourceSublistState.isDisplay;clonedSublistState.isChanged=sourceSublistState.isChanged;clonedSublistState.isHidden=sourceSublistState.isHidden;for(var i=0;i<sourceSublistState.getLineCount();i++)
+{var lineFields=sourceSublistState.getAllLineFields(i)||[];lineFields.forEach(function(v,i,a)
+{overwriteFieldState(clonedSublistState.getFieldState(v,i),sourceSublistState.getFieldState(v,i),false);});}
+return clonedSublistState;}
+function overwriteSublistsState(sink,source)
+{source.getAllSublists().forEach(function(sublistId,i,a)
+{overwriteSublistState(sink.getSublistState(sublistId),source.getSublistState(sublistId));});return sink;}
+function overwriteFieldState(clonedFieldState,sourceFieldState)
+{clonedFieldState.useTextApi=sourceFieldState.useTextApi;clonedFieldState.isParsed=sourceFieldState.isParsed;clonedFieldState.isMandatory=sourceFieldState.isMandatory;clonedFieldState.isHidden=sourceFieldState.isHidden;clonedFieldState.isDisabled=sourceFieldState.isDisabled;clonedFieldState.isVisible=sourceFieldState.isVisible;clonedFieldState.isDisplay=sourceFieldState.isDisplay;clonedFieldState.isReadOnly=sourceFieldState.isReadOnly;clonedFieldState.ignoreSlaving=sourceFieldState.ignoreSlaving;clonedFieldState.isChanged=sourceFieldState.isChanged;clonedFieldState.label=sourceFieldState.label;clonedFieldState.id=sourceFieldState.id;return clonedFieldState;}
+function overwriteFieldsState(clonedRecordStateController,sourceRecordStateController)
+{sourceRecordStateController.getAllFields().forEach(function(fieldId,i,a)
+{overwriteFieldState(clonedRecordStateController.getFieldState(fieldId),sourceRecordStateController.getFieldState(fieldId));});return clonedRecordStateController;}
+function overwriteRecordState(clonedRecordStateController,sourceRecordStateController)
+{overwriteFieldsState(clonedRecordStateController,sourceRecordStateController);overwriteSublistsState(clonedRecordStateController,sourceRecordStateController);return clonedRecordStateController;}
+function clone(options)
+{options=options||{};options.cloneable=options.cloneable!==undefined?!!options.cloneable:true;options.mergeable=options.mergeable!==undefined?!!options.mergeable:false;var clonedModelController=getModelController().clone(),clonedMetadata=getMetadata().clone(),clonedState=overwriteRecordState(recordStateController.create({metadata:clonedMetadata,data:clonedModelController,getModelController:function()
+{return clonedModelController;}}),getRecordStateController());var R={id:that.id,data:clonedModelController,metadata:clonedMetadata,state:clonedState,isDynamic:true,isSubrecord:true,isUserEvent:false,recordContext:util.extend({},_recordRequestContext)};var recordClone=new Record({recordObj:R,cloneable:options.cloneable,merge:(options.mergeable?function()
+{return merge(recordClone);}:undef)});if(getIsSubrecord())
+{recordClone.link(subrecordParent,subrecordSublistId,subrecordFieldId);}
+freshCopies.add(recordClone);return recordClone;}
+function merge(copy)
+{if(!freshCopies.contains(copy))
+{utilityFunctions.throwSuiteScriptError(error.Type.INVALID_SUBRECORD_MERGE);}
+else
+{var sysId=getValue(subrecordUtil.SYS_ID);var sysParentId=getValue(subrecordUtil.SYS_PARENT_ID);copy.validate();var clonedMetadata=copy.getMetadata().clone();setMetadata(clonedMetadata);var clonedModelController=copy.getModelController().clone();setModelController(clonedModelController);var newRecordState=overwriteRecordState(recordStateController.create({metadata:clonedMetadata,data:clonedModelController,getModelController:getModelController}),copy.getRecordStateController());setRecordStateController(newRecordState);copy.setValue(subrecordUtil.SYS_ID,sysId);copy.setValue(subrecordUtil.SYS_PARENT_ID,sysParentId);that.setValue(subrecordUtil.SYS_ID,sysId);that.setValue(subrecordUtil.SYS_PARENT_ID,sysParentId);freshCopies.add(copy);}}
+function synchronization_removelines(dynamicRecord)
+{var sublists=getModelController().getSublists();for(var i=0;i<sublists.length;i++)
+{var sublistId=sublists[i];var sublistState=getSublistState(sublistId);if(!sublistState&&shouldValidateFieldPermissions())
+{utilityFunctions.throwSuiteScriptError(error.Type.WS_NO_PERMISSIONS_TO_SET_VALUE,sublistId);}
+if(!sublistState||!sublistState.isChanged)
+{continue;}
+for(var lineNum=dynamicRecord.doGetLineCount(sublistId)-1;lineNum>=0;lineNum--)
+{if(dynamicRecord.getSublistState(sublistId)&&dynamicRecord.getSublistState(sublistId).isLineInserted(lineNum))
+{continue;}
+if(sublistState.isLineRemoved(lineNum))
+{dynamicRecord.doSelectLine(sublistId,lineNum);dynamicRecord.doRemoveLine(sublistId,dynamicRecord.doGetCurrentSublistIndex(sublistId));}}}
+return dynamicRecord;}
+function synchronize(deferredDynamicRecordState,record)
+{deferredDynamicRecordState=deferredDynamicRecordState||_state;var fieldId,fieldLevelMetadata,fieldState,fieldChanged,isSubrecordField,deferredSubrecord,subrecord,sysIdsUpdated;if(!record)
+{var newRecordObj=util.extend({},recordObj);newRecordObj.isDynamic=true;record=new Record({'recordObj':newRecordObj});}
+var sorted_bodyFields=_metadata.sortedFields;for(var i=0;i<sorted_bodyFields.length;i++)
+{fieldId=sorted_bodyFields[i];fieldLevelMetadata=_metadata.getFieldMetadata(null,fieldId);isSubrecordField=!!fieldLevelMetadata&&fieldLevelMetadata.type==='summary';fieldState=deferredDynamicRecordState.getFieldState(fieldId);fieldChanged=!!fieldState&&fieldState.isChanged;if(isSubrecordField)
+{if(!sysIdsUpdated)
+{record.setValue(subrecordUtil.SYS_ID,getValue(subrecordUtil.SYS_ID));record.setValue(subrecordUtil.SYS_PARENT_ID,getValue(subrecordUtil.SYS_PARENT_ID));sysIdsUpdated=true;}
+deferredSubrecord=getModelController().getSubrecord(fieldId);if(fieldChanged)
+{record.doRemoveSubrecord(fieldId);}
+if(!!deferredSubrecord)
+{subrecord=record.doGetBodySubrecord(fieldId);subrecord=deferredSubrecord.synchronize(deferredSubrecord.getRecordStateController(),subrecord);subrecord.validate();}}
+else
+{if(fieldChanged)
+{if(fieldState.useTextApi)
+{record.setText(fieldId,getText(fieldId));}
+else
+{record.setValue(fieldId,getValue(fieldId));}}}}
+var fields=deferredDynamicRecordState.getAllFields();for(var j=0;j<fields.length;j++)
+{fieldId=fields[j];fieldLevelMetadata=_metadata.getFieldMetadata(undef,fieldId);fieldState=deferredDynamicRecordState.getFieldState(fieldId);fieldChanged=!!fieldState&&fieldState.isChanged;if(fieldLevelMetadata==null&&fieldChanged)
+{if(fieldState.useTextApi)
+{record.setText(fieldId,getText(fieldId));}
+else
+{record.setValue(fieldId,getValue(fieldId));}}}
+record=synchronization_removelines(record);var sublists=_metadata.sortedSublists;for(var k=0;k<sublists.length;k++)
+{var sublistId=sublists[k];var sublistState=getSublistState(sublistId);var sublistMetadata=getSublistMetadata(sublistId);if(!sublistState||!sublistState.isChanged||!sublistMetadata)
+{continue;}
+if(sublistMetadata)
+{for(var deferredDynamicRecordLineNum=0,dynamicRecordLineNum=0;deferredDynamicRecordLineNum<doGetLineCount(sublistId);deferredDynamicRecordLineNum++,dynamicRecordLineNum++)
+{var dynamicRecordLineCount=record.doGetLineCount(sublistId);var lineObj=null;if(sublistState.isLineInserted(deferredDynamicRecordLineNum))
+{if(record.doGetLineCount(sublistId)<dynamicRecordLineNum)
+{lineObj=record.doSelectNewLine(sublistId);}
+else
+{lineObj=record.doInsertLine(sublistId,dynamicRecordLineNum,sublistMetadata.isRecalcDeferred);}}
+else if(sublistState.isLineChanged(deferredDynamicRecordLineNum))
+{lineObj=record.doSelectLine(sublistId,dynamicRecordLineNum);}
+else
+{continue;}
+var sys_id=doGetSublistValue(sublistId,subrecordUtil.SYS_ID,deferredDynamicRecordLineNum);if(!utilityFunctions.isValEmpty(sys_id))
+{record.doSetCurrentSublistFieldValue(sublistId,subrecordUtil.SYS_ID,sys_id,false);}
+var sortedFields=sublistMetadata.sortedFields;for(var l=0;l<sortedFields.length;l++)
+{fieldId=sortedFields[l];fieldLevelMetadata=_metadata.getFieldMetadata(sublistId,fieldId);isSubrecordField=!!fieldLevelMetadata&&fieldLevelMetadata.type==='summary';fieldState=sublistState.getFieldState(fieldId,deferredDynamicRecordLineNum);fieldChanged=!!fieldState&&fieldState.isChanged;if(isSubrecordField)
+{if(!sysIdsUpdated)
+{record.doSetCurrentSublistFieldValue(sublistId,subrecordUtil.SYS_ID,doGetSublistValue(sublistId,subrecordUtil.SYS_ID,deferredDynamicRecordLineNum),false);record.doSetCurrentSublistFieldValue(sublistId,subrecordUtil.SYS_PARENT_ID,doGetSublistValue(sublistId,subrecordUtil.SYS_PARENT_ID,deferredDynamicRecordLineNum),false);sysIdsUpdated=true;}
+deferredSubrecord=getModelController().getSublistSubrecord(sublistId,fieldId,deferredDynamicRecordLineNum);if(fieldChanged)
+{record.removeCurrentSublistSubrecord(sublistId,fieldId);}
+if(!!deferredSubrecord)
+{subrecord=record.doGetCurrentSublistSubrecord(sublistId,fieldId);subrecord=deferredSubrecord.synchronize(deferredSubrecord.getRecordStateController(),subrecord);subrecord.validate();}}
+else
+{if(fieldChanged)
+{if(fieldState.useTextApi)
+{record.doSetCurrentSublistText(sublistId,fieldId,getSublistText(sublistId,fieldId,deferredDynamicRecordLineNum));}
+else
+{record.doSetCurrentSublistValue(sublistId,fieldId,getSublistValue(sublistId,fieldId,deferredDynamicRecordLineNum));}}}}
+var backwardCompatibilityFieldNames=sublistMetadata.backwardCompatibilityFieldNamesForSubrecord;var sublistFields=sublistState.getAllFields();for(var m=0;m<sublistFields.length;m++)
+{var sublistFieldName=sublistFields[m];if(backwardCompatibilityFieldNames.indexOf(sublistFieldName)==-1&&sublistMetadata.getFieldMetadata(sublistFieldName)==null&&sublistState.getFieldState(sublistFieldName,deferredDynamicRecordLineNum).isChanged)
+{if(sublistState.getFieldState(fieldId,deferredDynamicRecordLineNum).useTextApi)
+{record.doSetCurrentSublistText(sublistId,fieldId,getSublistText(sublistId,sublistFieldName,deferredDynamicRecordLineNum),false);}
+else
+{record.doSetCurrentSublistValue(sublistId,sublistFieldName,getSublistValue(sublistId,sublistFieldName,deferredDynamicRecordLineNum),false);}}}
+record.doCommitLine(sublistId,sublistMetadata.isRecalcDeferred);var linesAddedInThisIteration=record.doGetLineCount(sublistId)-dynamicRecordLineCount;if(linesAddedInThisIteration>1)
+{dynamicRecordLineNum=dynamicRecordLineNum+linesAddedInThisIteration-1;}}
+if(sublistMetadata.isRecalcDeferred)
+{record.triggerRecalcScript(sublistId,false,'batchcommit');}}}
+return record;}
+this.synchronize=synchronize;function getQuery()
+{return slaving.cleanupQueryURL(_metadata.queryUrl);}
+function save(options,returnFetchedObject)
+{options=options||{};if(returnFetchedObject)
+{options.returnLabel=true;options.returnMessage=true;}
+else
+delete options.isFormSave;if(getIsCurrentRecord()&&scope.isExecutionWithinAClientScript())
+{utilityFunctions.throwSuiteScriptError(error.Type.SSS_UNSUPPORTED_METHOD);}
+var argList=doSave(options);var result=invoker(remoteApi,'submitDynamicClientRecord',argList);try
+{return returnFetchedObject?saveResult.create(options,result):parseInt(result.recordData.id,10);}
+finally
+{dereferencedBodySubrecords();}}
+this.save=recordDefinitionEvent.wrapEmitError({record:that,func:function(options){return save(options,false);},emitter:emitter});this.saveAndFetch=recordDefinitionEvent.wrapEmitError({record:that,func:function(options){return save(options,true);},emitter:emitter});function promiseToSave(options,returnFetchedObject)
+{options=options||{};if(returnFetchedObject)
+{options.returnLabel=true;options.returnMessage=true;}
+else
+delete options.isFormSave;var myPromise=new Promise(function(resolve,reject)
+{function callback(result,exception)
+{if(exception)
+{reject(exception);return;}
+dereferencedBodySubrecords();resolve(returnFetchedObject?saveResult.create(options,result):parseInt(result.recordData.id,10));}
+try
+{var argList=doSave(options);invoker(remoteApi,'submitDynamicClientRecord',argList,callback);}
+catch(e)
+{reject(e);}});return myPromise;}
+this.save.promise=recordDefinitionEvent.wrapEmitError({record:that,func:function(options){return promiseToSave(options,false);},emitter:emitter});this.saveAndFetch.promise=recordDefinitionEvent.wrapEmitError({record:that,func:function(options){return promiseToSave(options,true);},emitter:emitter});function doSave(options)
+{options=options||{};var submitOptions={enablesourcing:options['enableSourcing']===true,disabletriggers:options['disableTriggers']===true,ignoremandatoryfields:options['ignoreMandatoryFields']===true,returnlabel:options['returnLabel']===true,returnmessage:options['returnMessage']!==false,failOnAfterSubmitScriptError:options['returnMessage']===false};if(options.hasOwnProperty('isFormSave'))
+submitOptions.isFormSave=options.isFormSave===true;handleRecordSpecificSaveOptions(getRecordType(),options,submitOptions);var dynamicRecordToBeSubmitted=getIsDynamicRecord()?that:synchronize(_state);dynamicRecordToBeSubmitted.commitSubrecords();dynamicRecordToBeSubmitted.triggerSaveRecordScript(submitOptions.ignoremandatoryfields);var data=dynamicRecordToBeSubmitted.getRecordData();return[getRecordType(),data.fields,data.sublists,submitOptions];}
+function handleRecordSpecificSaveOptions(recType,options,submitOptions)
+{var possibleSaveOptions=RECORD_SPECIFIC_SAVE_OPTIONS[recType];if(utilityFunctions.isObject(options)&&util.isArray(possibleSaveOptions))
+{for(var i=0;i<possibleSaveOptions.length;i++)
+{var thisPossibleOption=possibleSaveOptions[i];if(options.hasOwnProperty(thisPossibleOption))
+{submitOptions[thisPossibleOption]=options[thisPossibleOption];}}}}
+function commitSubrecords()
+{var bodyFields=getModelController().getBodyFieldIds();bodyFields.forEach(function(fieldId)
+{var fieldType=getFieldType(undef,fieldId);if(recordUtil.FIELD_TYPE.SUBRECORD_FIELD_TYPE===fieldType&&getModelController().hasSubrecord(fieldId))
+{var subrecord=getModelController().getSubrecord(fieldId);if(!!subrecord)
+{subrecord.validate();}}});}
+this.commitSubrecords=commitSubrecords;function dereferencedBodySubrecords()
+{var bodyFields=getModelController().getBodyFieldIds();bodyFields.forEach(function(fieldId)
+{var fieldType=getFieldType(undef,fieldId);if(recordUtil.FIELD_TYPE.SUBRECORD_FIELD_TYPE===fieldType&&getModelController().hasSubrecord(fieldId))
+{var subrecord=getModelController().getSubrecord(fieldId);if(!!subrecord)
+{subrecord.setDereferencedFromParent(true);}}});}
+function dereferencedSublistLineSubrecords(sublistId,lineInstanceId,useBuffer)
+{var sublistLineFieldIds=getModelController().getSublistLineFieldIds(sublistId,lineInstanceId,useBuffer);sublistLineFieldIds.forEach(function(fieldId)
+{var fieldType=getFieldType(sublistId,fieldId);if(recordUtil.FIELD_TYPE.SUBRECORD_FIELD_TYPE===fieldType&&getModelController().hasSublistSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer))
+{var subrecord=getModelController().doGetSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);if(!!subrecord)
+{subrecord.setDereferencedFromParent(true);}}});}
+function getRecordData()
+{var CREATE='CREATE',EDIT='EDIT',VIEW='VIEW';var wasInternal=isInternal();setInternalEvent(true);var body={},sublists={},mainFieldNames=getFields(),sublistNames=_metadata.sublistIds;mainFieldNames.forEach(function(fieldId)
+{var value=getValueAsLegacyString(fieldId);if(value!==undef)
+{body[fieldId]=recordUtil.emptyIfNullOrUndefined(value);}});var subrecordData=getModelController().getSubrecordDataForSubmission();if(subrecordData)
+{Object.keys(subrecordData).forEach(function(v,i,a)
+{sublists[v]=subrecordData[v];body['next'+v+'idx']=String(subrecordData[v].size+1);});}
+sublistNames.forEach(function(sublistId)
+{var sublistData={};sublistData.fields=_metadata.getAllSublistFields(sublistId);if(sublistData.fields.length>0)
+{if(subrecordData)
+{sublistData.fields.splice(0,0,subrecordUtil.SYS_PARENT_ID,subrecordUtil.SYS_ID,subrecordUtil.SYS_OP);}
+sublistData.size=doGetLineCount(sublistId);sublistData.data=doGetLineCount(sublistId)>0?[]:null;for(var ln=0;ln<doGetLineCount(sublistId);ln++)
+{var sublistLine=sublistData.fields.map(function(fieldId)
+{if(fieldId===subrecordUtil.SYS_OP)
+{var operation=EDIT;if(!getSublistState(sublistId).isLineChanged(ln))
+{operation=VIEW;}
+if(getSublistState(sublistId).isLineInserted(ln))
+{operation=CREATE;}
+return operation;}
+return recordUtil.emptyIfNullOrUndefined(getSublistLineValueAsLegacyString(sublistId,fieldId,ln));});sublistData.data[ln]=sublistLine;}
+sublists[sublistId]=sublistData;}});setInternalEvent(wasInternal);return{fields:body,sublists:sublists};}
+this.getRecordData=getRecordData;function handleChangeCall(params)
+{if(getIsDynamicRecord())
+{var sysId=doGetValue(subrecordUtil.SYS_ID),sysParentId=doGetValue(subrecordUtil.SYS_PARENT_ID);var context=getRecordRequestContext();var params=utilityFunctions.addParameterToMap(context,params);params.recordmode='dynamic';var nsrecord=invoker(remoteApi,'handleChangeCall',[getRecordType(),getId(),params,true]);_recordRequestContext=nsrecord.recordContext;_recordScriptingV1Scope=scope.create({record:that,libraryScript:getMetadata().libraryScript,staticScript:getMetadata().staticScript,uiFormScript:getMetadata().uiFormScript,workflowScript:getMetadata().workflowScript,completePageInit:completePageInit});setMetadata(metadata.create(nsrecord.metadata));setModelController(modelController.create({type:_metadata.type,data:nsrecord.data}));setRecordStateController(recordStateController.create({metadata:_metadata,data:getModelController(),getModelController:getModelController}));doSetFieldValue(subrecordUtil.SYS_ID,sysId,true,false);doSetFieldValue(subrecordUtil.SYS_PARENT_ID,sysParentId,true,false);implementation.initRecord(that,_recordScriptingV1Scope);recordDefinitionEvent.emitUpdateAll(emitter,that);}}
+this.handleChangeCall=handleChangeCall;function callRestrictedMethod(options)
+{options=options||{};utilityFunctions.checkArgs([options.token,options.methodName],['token','methodName'],getMissingArgumentErrorMessageFillerValue('hasSublistSubrecord'));if(options.token!=null&&options.token===recordObj.token)
+{this[options.methodName].apply(this,options.args||[]);}}
+this.callRestrictedMethod=recordDefinitionEvent.wrapEmitError({record:that,func:callRestrictedMethod,emitter:emitter});this.runLegacyScript=function runLegacyScript(script)
+{return _recordScriptingV1Scope.runLegacyScript(script);};function subrecord_link(parent,sublistId,fieldId)
+{subrecordParent=parent;subrecordSublistId=sublistId;subrecordFieldId=fieldId;}
+function subrecord_linkParentState(parentSublistState,parentFieldState)
+{subrecordSublistState=parentSublistState;subrecordFieldState=parentFieldState;}
+function subrecord_updateFieldState(isChanged)
+{if(subrecordSublistState!=null)
+{subrecordSublistState.isChanged=isChanged;}
+if(subrecordFieldState!=null)
+{subrecordFieldState.isChanged=isChanged;}}
+function getSubrecordSublistState()
+{return subrecordSublistState;}
+this.getSubrecordSublistState=getSubrecordSublistState;function getSubrecordFieldState()
+{return subrecordFieldState;}
+this.getSubrecordFieldState=getSubrecordFieldState;function subrecord_abandon()
+{subrecordParent=null;subrecordDead=true;invalidateSubrecordClones();doSetFieldValue(subrecordUtil.SYS_PARENT_ID,null,false,true);}
+function subrecord_isValidated()
+{return!!subrecordValidated;}
+function subrecord_setDereferencedFromParent(dereferencedFromParent)
+{subrecordIsDereferencedFromParent=dereferencedFromParent;if(dereferencedFromParent)
+{subrecord_abandon();}}
+function subrecord_isDereferencedFromParent()
+{return subrecordIsDereferencedFromParent;}
+function subrecord_validate()
+{if(!subrecordValidated)
+{triggerSaveRecordScript(false);subrecord_triggerPostValidationEventOnParent();subrecordValidated=true;}}
+function subrecord_triggerPostValidationEventOnParent()
+{var line=-1;var value=null;if(!subrecordSublistId)
+{value=subrecordParent.getValue(subrecordFieldId);}
+else
+{line=subrecordParent.getCurrentSublistIndex(subrecordSublistId);value=subrecordParent.getCurrentSublistValue(subrecordSublistId,subrecordFieldId);}
+if(_recordScriptingV1Scope)
+{_recordScriptingV1Scope.invalidateSubrecordCache(subrecordSublistId,subrecordFieldId,line);}
+subrecordParent.triggerFieldChangeEvent(subrecordSublistId,subrecordFieldId,line,String(value),false);}
+function subrecord_setReadonly(value)
+{subrecordReadOnly=getIsSubrecord()&&!!value;}
+this.setReadonly=subrecord_setReadonly;function getSubrecordRedirect(sublistId,fieldId)
+{var subrecordFieldIds=!!sublistId?subrecordCompatibility[sublistId]||[]:subrecordCompatibility.body;subrecordFieldIds=subrecordFieldIds.reduce(function(p,c,i,a)
+{var subrecordFieldId=c;var subrecordCompatibilityMap=_metadata.getFieldMetadata(sublistId,subrecordFieldId).subrecordCompatibilityMap;if(!!subrecordCompatibilityMap&&subrecordCompatibilityMap.hasOwnProperty(fieldId))
+{p.push({subrecordFieldId:subrecordFieldId,fieldId:subrecordCompatibilityMap[fieldId]});}
+return p;},[]);return subrecordFieldIds[0]||null;}
+this.getSubrecordRedirect=getSubrecordRedirect;function hasSubrecordRedirect(sublistId,fieldId)
+{return!!getSubrecordRedirect(sublistId,fieldId);}
+function doGetSubrecordInitialParamsInfo(sublistId,fieldId)
+{var fieldMetadata=_metadata.getFieldMetadata(sublistId,fieldId),initialParams=fieldMetadata.subrecordInitialParameters||[];return initialParams;}
+function getSystemId()
+{return getModelController().getSystemId();}
+function getSublistSystemId(sublistId,line)
+{return getModelController().getSublistSystemId(sublistId,line);}
+function getCurrentSublistSystemId(sublistId)
+{return getModelController().getCurrentSublistSystemId(sublistId);}
+function doGetSubrecordInitialParamsForInstance(field,lineInstanceId,useBuffer)
+{var result={},sublistId=field.getSublistName(),fieldId=field.getName(),initialParams=doGetSubrecordInitialParamsInfo(sublistId,fieldId);initialParams.forEach(function(v,i,a)
+{var param=v.param,path=v.path.split('.'),mandatory=v.mandatory,value=path.length===1&&path[0]||null;if(path.length>1)
+{if(!!sublistId)
+{if(path.length===2)
+{value=getModelController().getSublistLineValueAsLegacyStringForInstance(sublistId,path[1],lineInstanceId,useBuffer);}
+else
+{value=doGetValue(path[2]);}}
+else
+{value=doGetValue(path[1]);}}
+if(mandatory||value!==undef&&value!==null&&value!=='')
+{result[param]=value;}});if(getIsDynamicRecord())
+{result.recordmode='dynamic';}
+return result;}
+function doGetSubrecordFromServerForInstance(field,id,lineInstanceId,useBuffer)
+{var result,sublistId,fieldId,type,nsrecord,initializedParams;if(field===null||field.getType()!=='summary')
+{utilityFunctions.throwSuiteScriptError(error.Type.FIELD_1_IS_NOT_A_SUBRECORD_FIELD,field.getName());}
+else
+{sublistId=field.getSublistName();fieldId=field.getName();type=field.getSubrecordType();initializedParams=doGetSubrecordInitialParamsForInstance(field,lineInstanceId,useBuffer);var parentSystemId=getModelController().getParentSystemIdForInstance(sublistId,lineInstanceId,useBuffer);if(!!id)
+{nsrecord=invoker(apiBridge,'loadRecord',[type,String(id),initializedParams]);nsrecord.isReadOnly=getIsReadOnlyRecord();nsrecord.isCurrentRecord=getIsCurrentRecord();nsrecord.data.initialization={method:'loadRecord',params:{type:type,id:String(id),defaults:initializedParams}};nsrecord.data.bodyField.sys_parentid=[parentSystemId];result=new Record({recordObj:nsrecord});}
+else
+{triggerCanCreateSubrecordScriptForInstance(sublistId,fieldId,lineInstanceId,useBuffer);nsrecord=invoker(apiBridge,'createRecord',[type,initializedParams]);nsrecord.isReadOnly=getIsReadOnlyRecord();nsrecord.isCurrentRecord=getIsCurrentRecord();nsrecord.data.initialization={method:'createRecord',params:{type:type,defaults:initializedParams}};nsrecord.data.bodyField.sys_parentid=[parentSystemId];result=new Record({recordObj:nsrecord});}
+result.link(that,sublistId,fieldId);var sublistFieldState=getSublistFieldStateForInstance(sublistId,fieldId,lineInstanceId,useBuffer);result.linkParentState(getSublistState(sublistId),sublistFieldState);}
+return result;}
+function hasSubrecord(options)
+{var useBuffer=false;var fieldId=recordUtil.handleOverloadingMethodsForSingleArgument(options,'fieldId',getMissingArgumentErrorMessageFillerValue('hasSubrecord'));return doHasSubrecord(undef,fieldId,-1,useBuffer);}
+this.hasSubrecord=hasSubrecord;function getSubrecord(options)
+{var fieldId=recordUtil.handleOverloadingMethodsForSingleArgument(options,'fieldId',getMissingArgumentErrorMessageFillerValue('getSubrecord'));var subrecord=doGetBodySubrecord(fieldId);return subrecord;}
+this.getSubrecord=getSubrecord;function removeSubrecord(options)
+{var fieldId=recordUtil.handleOverloadingMethodsForSingleArgument(options,'fieldId',getMissingArgumentErrorMessageFillerValue('removeSubrecord'));if(!hasFieldValueOrFieldExisted(fieldId))
+{utilityFunctions.throwSuiteScriptError(error.Type.FIELD_1_IS_NOT_A_SUBRECORD_FIELD,fieldId);}
+doRemoveSubrecord(fieldId);}
+this.removeSubrecord=recordDefinitionEvent.wrapEmitError({record:that,func:removeSubrecord,emitter:emitter});function performSubrecordRemoval(fieldId)
+{var useBuffer=false;var sublistId=undef;var lineInstanceId=null;doRemoveSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);getModelController().removeFieldValue(fieldId);}
+this.performSubrecordRemoval=performSubrecordRemoval;function doRemoveSubrecord(fieldId)
+{var sublistId=undef;performSubrecordRemoval(fieldId);var subrecordKeyFieldId=getSubrecordKeyFieldId(sublistId,fieldId);if(!!subrecordKeyFieldId)
+{var keyFieldId=subrecordKeyFieldId[0];var value='';var fireFieldChanged=true;var noSlaving=false;doSetFieldValue(keyFieldId,value,fireFieldChanged,noSlaving);}}
+this.doRemoveSubrecord=doRemoveSubrecord;function doRemoveSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer)
+{var field=getCachedRecordFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);subrecordUtil.validateIfSummaryField(field,fieldId);var subrecord=getModelController().doGetSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);if(!!subrecord)
+{subrecord.setDereferencedFromParent(true);subrecord.abandon();}
+getModelController().clearSubrecordCacheForInstance(sublistId,fieldId,lineInstanceId,useBuffer);invalidateSubrecordClones();}
+function doRemoveSublistSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer)
+{var field=getCachedRecordFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);subrecordUtil.validateIfSummaryField(field,fieldId);var subrecord=getModelController().doGetSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);getModelController().clearSubrecordCacheForInstance(sublistId,fieldId,lineInstanceId,useBuffer);if(!!subrecord)
+{subrecord.setDereferencedFromParent(true);subrecord.abandon();}
+postRemoveSublistSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+this.doRemoveSublistSubrecordForInstance=doRemoveSublistSubrecordForInstance;function postRemoveSublistSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer)
+{var value=null;if(useBuffer)
+{var fireFieldChanged=true;doSetCurrentSublistValue(sublistId,fieldId,value,fireFieldChanged);var subrecordKeyFieldId=getSubrecordKeyFieldId(sublistId,fieldId);if(!!subrecordKeyFieldId)
+{setCurrentSublistValue(sublistId,subrecordKeyFieldId[0],'');}}
+else
+{invalidateSubrecordClones();getModelController().setSublistLineValueForInstance(sublistId,fieldId,lineInstanceId,value,useBuffer);}}
+function getSubrecordKeyFieldId(sublistId,fieldId)
+{var subrecordKeyFieldId=doGetSubrecordInitialParamsInfo(sublistId,fieldId).reduce(function(p,c,i,a)
+{return p||(c.param==='id'&&c.path)||null;},null);return SUBRECORD_KEY_FIELDID_REGEX.test(subrecordKeyFieldId)&&subrecordKeyFieldId.split('.').slice(-1)||null;}
+function hasSublistSubrecord(options,fieldId,line)
+{var useBuffer=false;var sublistId;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],getMissingArgumentErrorMessageFillerValue('hasSublistSubrecord'));return doHasSubrecord(sublistId,fieldId,line,useBuffer);}
+this.hasSublistSubrecord=hasSublistSubrecord;function doHasSubrecord(sublistId,fieldId,line,useBuffer)
+{var lineInstanceId=getLineInstanceId(sublistId,line,useBuffer);return doHasSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+function doHasSubrecordForInstance(sublistId,fieldId,lineInstanceId,usesBuffer)
+{var field=getCachedRecordFieldForInstance(sublistId,fieldId,lineInstanceId,usesBuffer);subrecordUtil.validateIfSummaryField(field,fieldId);return getModelController().hasSublistSubrecordForInstance(sublistId,fieldId,lineInstanceId,usesBuffer);}
+this.doHasSubrecordForInstance=doHasSubrecordForInstance;function getSublistSubrecord(options,fieldId,line)
+{var sublistId,field,id;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],getMissingArgumentErrorMessageFillerValue('getSublistSubrecord'));var subrecord=doGetSublistSubrecord(sublistId,fieldId,line);return subrecord;}
+this.getSublistSubrecord=getSublistSubrecord;function doGetSublistSubrecord(sublistId,fieldId,line)
+{var useBuffer=false;var lineInstanceId=getLineInstanceId(sublistId,line,useBuffer);return doGetSublistSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+this.doGetSublistSubrecord=doGetSublistSubrecord;function doGetBodySubrecord(fieldId)
+{var subrecord,field,id;var sublistId=undef;var lineInstanceId=null;var useBuffer=false;field=getCachedRecordFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);subrecordUtil.validateIfSummaryField(field,fieldId);subrecord=_modelController.getSubrecord(fieldId);if(!subrecord)
+{id=_modelController.getFieldValue(fieldId);subrecord=doGetSubrecordFromServerForInstance(field,id,lineInstanceId,useBuffer);getModelController().cacheSubrecord(fieldId,subrecord);invalidateSubrecordClones();}
+return subrecord;}
+this.doGetBodySubrecord=doGetBodySubrecord;function tryToGetSublistSubrecord(sublistId,fieldId,lineInstanceId,useBuffer)
+{var subrecord=getModelController().doGetSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);if(!subrecord&&useBuffer)
+{subrecord=getModelController().doGetSubrecordForInstance(sublistId,fieldId,lineInstanceId,!useBuffer);}
+return subrecord;}
+function doGetSublistSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer)
+{var field=getCachedRecordFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);subrecordUtil.validateIfSummaryField(field,fieldId);var subrecord=tryToGetSublistSubrecord(sublistId,fieldId,lineInstanceId,useBuffer);if(!subrecord)
+{var id=getModelController().getSublistLineValueForInstance(sublistId,fieldId,lineInstanceId,useBuffer);subrecord=doGetSubrecordFromServerForInstance(field,id,lineInstanceId,useBuffer);getModelController().cacheSublistSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer,subrecord);invalidateSubrecordClones();}
+return subrecord;}
+this.doGetSublistSubrecordForInstance=doGetSublistSubrecordForInstance;function removeSublistSubrecord(options,fieldId,line)
+{var sublistId;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],getMissingArgumentErrorMessageFillerValue('removeSublistSubrecord'));if(!hasSublistFieldValueOrSublistFieldExisted(sublistId,fieldId,line))
+{utilityFunctions.throwSuiteScriptError(error.Type.FIELD_1_IS_NOT_A_SUBRECORD_FIELD,fieldId);}
+var useBuffer=false;var lineInstanceId=getLineInstanceId(sublistId,line,useBuffer);doRemoveSublistSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+this.removeSublistSubrecord=recordDefinitionEvent.wrapEmitError({record:that,func:removeSublistSubrecord,emitter:emitter});function hasCurrentSublistSubrecord(options,fieldId)
+{var sublistId;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],getMissingArgumentErrorMessageFillerValue('hasCurrentSublistSubrecord'));return doHasCurrentSublistSubrecord(sublistId,fieldId);}
+this.hasCurrentSublistSubrecord=hasCurrentSublistSubrecord;function doHasCurrentSublistSubrecord(sublistId,fieldId)
+{var lineInstanceId=getModelController().getSublistSelectedLineInstanceId(sublistId);var useBuffer=true;return doHasSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+function getCurrentSublistSubrecord(options,fieldId)
+{var sublistId;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],getMissingArgumentErrorMessageFillerValue('getCurrentSublistSubrecord'));var subrecord=doGetCurrentSublistSubrecord(sublistId,fieldId);return subrecord;}
+this.getCurrentSublistSubrecord=getCurrentSublistSubrecord;function doGetCurrentSublistSubrecord(sublistId,fieldId)
+{var useBuffer=true;var lineInstanceId=getModelController().getSublistSelectedLineInstanceId(sublistId);var field=getCachedRecordFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);subrecordUtil.validateIfSummaryField(field,fieldId);var subrecord=getModelController().getCurrentSublistSubrecord(sublistId,fieldId);if(!subrecord)
+{getModelController().getSublistLineValueForInstance(sublistId,fieldId,lineInstanceId,useBuffer);var isSameSubrecordReference=doGetCurrentSublistIndex(sublistId)<doGetLineCount(sublistId)&&getModelController().getCurrentSublistLineValue(sublistId,fieldId)==getModelController().getSublistLineValue(sublistId,fieldId,doGetCurrentSublistIndex(sublistId));if(getModelController().hasNewlyCommittedSublistSubrecord(getModelController().getCurrentSublistSystemId(sublistId),fieldId)&&isSameSubrecordReference)
+{subrecord=doGetSublistSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);subrecord=subrecord.internalClone();subrecord.linkParentState(getSublistState(sublistId),getSublistState(sublistId).getCurrentLineFieldState(fieldId));}
+if(!subrecord)
+{var id=getModelController().getCurrentSublistLineValue(sublistId,fieldId);subrecord=doGetSubrecordFromServerForInstance(field,id,lineInstanceId,useBuffer);}
+getModelController().setCurrentSublistSubrecord(sublistId,fieldId,subrecord);}
+return subrecord;}
+this.doGetCurrentSublistSubrecord=doGetCurrentSublistSubrecord;function removeCurrentSublistSubrecord(options,fieldId)
+{var sublistId;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],getMissingArgumentErrorMessageFillerValue('removeCurrentSublistSubrecord'));if(!hasCurrentSublistFieldValueOrSublistFieldExisted(sublistId,fieldId))
+{utilityFunctions.throwSuiteScriptError(error.Type.FIELD_1_IS_NOT_A_SUBRECORD_FIELD,fieldId);}
+var useBuffer=true;var lineInstanceId=getModelController().getSublistSelectedLineInstanceId(sublistId);doRemoveSublistSubrecordForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+this.removeCurrentSublistSubrecord=recordDefinitionEvent.wrapEmitError({record:that,func:removeCurrentSublistSubrecord,emitter:emitter});function triggerPageInitScript()
+{implementation.triggerPageInitScript();}
+function triggerLineInitScript(sublistId)
+{implementation.triggerLineInitScript(sublistId);}
+function postDeleteLine(sublistId,line_0)
+{implementation.triggerPostDeleteLineScript(sublistId,recordUtil.getOneBasedIndex(line_0));}
+this.postDeleteLine=postDeleteLine;function postDeleteLineForInstance(sublistId,lineInstanceId,useBuffer)
+{var line_0=getLineIndexFromInstanceId(sublistId,lineInstanceId,useBuffer);postDeleteLine(sublistId,line_0);}
+this.postDeleteLineForInstance=postDeleteLineForInstance;function triggerLineCommitScript(sublistId,line)
+{implementation.triggerLineCommitScript(sublistId,line);}
+function triggerLineCommitScriptForInstance(sublistId,lineInstanceId,useBuffer)
+{var line_0=getLineIndexFromInstanceId(sublistId,lineInstanceId,useBuffer);triggerLineCommitScript(sublistId,recordUtil.getOneBasedIndex(line_0));}
+function triggerValidateLineScript(sublistId)
+{recordDefinitionEvent.wrapEmitValidationError({record:that,sublistId:sublistId,func:implementation.triggerValidateLineScript,emitter:emitter})(sublistId);}
+function triggerValidateInsertScript(sublistId)
+{recordDefinitionEvent.wrapEmitValidationError({record:that,sublistId:sublistId,func:implementation.triggerValidateInsertScript,emitter:emitter})(sublistId);}
+this.triggerValidateInsertScript=triggerValidateInsertScript;function triggerValidateDeleteScript(sublistId)
+{recordDefinitionEvent.wrapEmitValidationError({record:that,sublistId:sublistId,func:implementation.triggerValidateDeleteScript,emitter:emitter})(sublistId);}
+this.triggerValidateDeleteScript=triggerValidateDeleteScript;function triggerValidateFieldScript(sublistId,fieldId,line)
+{var lineItemMatrixFieldMetadata=line>=0&&matrix.parseMatrixLineField(that,fieldId,sublistId)||null;var fieldId=!!lineItemMatrixFieldMetadata&&lineItemMatrixFieldMetadata.fieldname||fieldId;var matrixColumn=!!lineItemMatrixFieldMetadata&&lineItemMatrixFieldMetadata.column||-1;recordDefinitionEvent.wrapEmitValidationError({record:that,func:implementation.triggerValidateFieldScript,sublistId:sublistId,fieldId:fieldId,emitter:emitter})(sublistId,fieldId,line,matrixColumn);}
+this.triggerValidateFieldScript=triggerValidateFieldScript;function triggerFieldChangeEvent(sublistId,fieldId,line,value,noSlaving)
+{implementation.triggerFieldChangeEvent(sublistId,fieldId,line,value,noSlaving);}
+this.triggerFieldChangeEvent=triggerFieldChangeEvent;function triggerFieldChangeEventForInstance(sublistId,fieldId,line,lineInstanceId,value,noSlaving)
+{implementation.triggerFieldChangeEventForInstance(sublistId,fieldId,line,lineInstanceId,value,noSlaving);}
+this.triggerFieldChangeEventForInstance=triggerFieldChangeEventForInstance;function triggerFieldChangeScript(sublistId,field,line)
+{var lineItemMatrixFieldMetadata=line>0&&matrix.parseMatrixLineField(that,field,sublistId)||null;var matrixColumn=!!lineItemMatrixFieldMetadata&&lineItemMatrixFieldMetadata.column||-1;var fieldId=!!lineItemMatrixFieldMetadata&&lineItemMatrixFieldMetadata.fieldname||field;implementation.triggerFieldChangeScript(sublistId,fieldId,line,matrixColumn);}
+this.triggerFieldChangeScript=triggerFieldChangeScript;function triggerCanCreateSubrecordScript(sublistId,fieldId,line)
+{implementation.triggerCanCreateSubrecordScript(sublistId,fieldId,line);}
+function triggerCanCreateSubrecordScriptForInstance(sublistId,fieldId,lineInstanceId,useBuffer)
+{var line_0=getLineIndexFromInstanceId(sublistId,lineInstanceId,useBuffer);implementation.triggerCanCreateSubrecordScript(sublistId,fieldId,recordUtil.getOneBasedIndex(line_0));}
+function triggerSaveRecordScript(ignoreMandatoryFields)
+{recordDefinitionEvent.wrapEmitValidationError({record:that,func:implementation.triggerSaveRecordScript,emitter:emitter})(ignoreMandatoryFields);}
+this.triggerSaveRecordScript=triggerSaveRecordScript;function triggerRecalcScript(sublistId,localRecalc,operation)
+{implementation.triggerRecalcScript(sublistId,localRecalc,operation);}
+this.triggerRecalcScript=triggerRecalcScript;function getValueAsLegacyString(fieldId)
+{return getModelController().getValueAsLegacyString(fieldId);}
+this.getValueAsLegacyString=getValueAsLegacyString;function getValueAsLegacyStringArray(fieldId)
+{return recordUtil.formatValueToArrayType(getValueAsLegacyString(fieldId));}
+this.getValueAsLegacyStringArray=getValueAsLegacyStringArray;function doSetFieldValueWithoutFormatValue(fieldId,value,fireFieldChange,noSlaving)
+{doSetFieldValue(fieldId,value,fireFieldChange,noSlaving,true);}
+this.doSetFieldValueWithoutFormatValue=doSetFieldValueWithoutFormatValue;function doSetCurrentSublistFieldValueWithoutFormatValue(sublistId,fieldId,value,fireFieldChange,noSlaving)
+{doSetCurrentSublistFieldValue(sublistId,fieldId,value,fireFieldChange,noSlaving,true);}
+this.doSetCurrentSublistFieldValueWithoutFormatValue=doSetCurrentSublistFieldValueWithoutFormatValue;function setValueAsLegacyString(fieldId,value,fireFieldChange,noSlaving)
+{if(isInternal())
+{doSetFieldValueWithoutFormatValue(fieldId,value,fireFieldChange,noSlaving);getFieldState(fieldId).isParsed=false;}
+else
+{value=recordUtil.formatArrayToStringType(value);var fieldLevelMetadata=getFieldLevelMetadataForBodyField(fieldId);doSetValue(fieldId,parseValue(isValidBodyField(fieldId),fieldLevelMetadata,value),fireFieldChange,noSlaving);}}
+function setCurrentSublistValueAsLegacyString(sublistId,fieldId,value,fireFieldChange,noSlaving)
+{if(isInternal())
+{var useBuffer=true;var currentLineIdx=doGetCurrentSublistIndex(sublistId);if(currentLineIdx===-1&&isMultilineEditable(sublistId))
+{warnAboutMLBCurrentIndexProblem("Internal Call is attempting to setCurrentSublistValueAsLegacyString on Multiline Enabled sublist but there is no current line index! Set IGNORED");}
+else
+{doSetCurrentSublistFieldValueWithoutFormatValue(sublistId,fieldId,value,fireFieldChange,noSlaving);getSublistFieldState(sublistId,fieldId,currentLineIdx,useBuffer).isParsed=false;}}
+else
+{value=recordUtil.formatArrayToStringType(value);var fieldLevelMetadata=getFieldLevelMetadataForSublistField(sublistId,fieldId);var parsedValue=parseValue(isValidSublistField(sublistId,fieldId),fieldLevelMetadata,value);doSetCurrentSublistValue(sublistId,fieldId,parsedValue,fireFieldChange,noSlaving);}}
+function setFieldValue(fieldId,value,fireFieldChange,noSlaving)
+{recordUtil.validateAgainstSqlInjection(fieldId,value);value=String(recordUtil.emptyIfNullOrUndefined(value));setValueAsLegacyString(fieldId,value,fireFieldChange,noSlaving);}
+this.setFieldValue=setFieldValue;function setFieldText(fieldId,text,fireFieldChange)
+{if(isFieldSelectType(null,fieldId))
+{if(util.isArray(text))
+{text.forEach(function(txt)
+{recordUtil.validateAgainstSqlInjection(fieldId,txt);});}
+else
+{recordUtil.validateAgainstSqlInjection(fieldId,text);}
+doSetText(fieldId,text,fireFieldChange);}}
+this.setFieldtext=setFieldText;function getFieldValue(fieldId)
+{return recordUtil.emptyIfNullOrUndefined(getValueAsLegacyString(fieldId));}
+this.getFieldValue=getFieldValue;function setFieldValues(fieldId,values,fireFieldChange,noSlaving)
+{if(isFieldMultiSelect(undef,fieldId))
+{if(util.isArray(values))
+{values.forEach(function(value)
+{recordUtil.validateAgainstSqlInjection(fieldId,value);});}
+else
+{recordUtil.validateAgainstSqlInjection(fieldId,values);}
+values=util.isArray(values)?values:[values];values=recordUtil.formatArrayToStringType(values);setFieldValue(fieldId,values,fireFieldChange,noSlaving);}}
+this.setFieldValues=setFieldValues;function setFieldTexts(fieldId,texts,fireFieldChange)
+{if(isFieldMultiSelect(fieldId))
+{doSetTexts(fieldId,texts,fireFieldChange);}}
+this.setFieldTexts=setFieldTexts;function getSublistLineValueAsLegacyString(sublistId,fieldId,line)
+{return getModelController().getSublistLineValueAsLegacyString(sublistId,fieldId,line);}
+this.getSublistLineValueAsLegacyString=getSublistLineValueAsLegacyString;function getSublistLineValueAsLegacyStringForInstance(sublistId,fieldId,lineInstanceId,useBuffer)
+{return getModelController().getSublistLineValueAsLegacyStringForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+this.getSublistLineValueAsLegacyStringForInstance=getSublistLineValueAsLegacyStringForInstance;function getSublistLineValueAsLegacyStringArray(sublistId,fieldId,line)
+{return recordUtil.formatValueToArrayType(getSublistLineValueAsLegacyString(sublistId,fieldId,line));}
+this.getSublistLineValueAsLegacyStringArray=getSublistLineValueAsLegacyStringArray;function getCurrentSublistLineValueAsLegacyString(sublistId,fieldId)
+{return getModelController().getCurrentSublistLineValueAsLegacyString(sublistId,fieldId);}
+this.getCurrentSublistLineValueAsLegacyString=getCurrentSublistLineValueAsLegacyString;function setLineItemValue(sublistId,fieldId,line_0,value)
+{if(isSublistValid(sublistId))
+{recordUtil.validateAgainstSqlInjection(fieldId,value);var fieldLevelMetadata=getFieldLevelMetadataForSublistField(sublistId,fieldId);var parsedValue=parseValue(isValidSublistField(sublistId,fieldId),fieldLevelMetadata,value);var validatedValue=validateAndFormatFieldValue(sublistId,fieldId,parsedValue);doSetSublistValue(sublistId,fieldId,line_0,validatedValue);}}
+this.setLineItemValue=setLineItemValue;function setCurrentLineItemValue(sublistId,fieldId,value,fireFieldChange,noSlaving)
+{recordUtil.validateAgainstSqlInjection(fieldId,value);value=String(recordUtil.emptyIfNullOrUndefined(value));setCurrentSublistValueAsLegacyString(sublistId,fieldId,value,fireFieldChange,noSlaving);}
+this.setCurrentLineItemValue=setCurrentLineItemValue;function setCurrentLineItemText(sublistId,fieldId,text,fireFieldChange)
+{if(isFieldSelectType(sublistId,fieldId))
+{if(util.isArray(text))
+{text.forEach(function(txt)
+{recordUtil.validateAgainstSqlInjection(fieldId,txt);});}
+else
+{recordUtil.validateAgainstSqlInjection(fieldId,text);}
+doSetCurrentSublistText(sublistId,fieldId,text,fireFieldChange);}}
+this.setCurrentLineItemText=setCurrentLineItemText;function getSublist(options)
+{var sublistId;sublistId=options!==undef&&options!==null&&!util.isString(options)?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],getMissingArgumentErrorMessageFillerValue('getSublist'));return doGetSublist(sublistId);}
+this.getSublist=getSublist;function doGetSublist(sublistId)
+{function createSublist(type,state,fields)
+{var _sublist=sublist.create({type:type,sublistState:state,sublistFields:fields});return _sublist;}
+var sublistLevelMetadata=getSublistMetadata(sublistId);var jsSublist=(sublistLevelMetadata!=null)?createSublist(sublistLevelMetadata.nlobjSublistConstructorType,_state.getSublistState(sublistId),sublistLevelMetadata.fieldMetadata):null;if(jsSublist!==null)
+{jsSublist=sublistMD.wrap({delegate:jsSublist,category:getSublistDefinitionCategory()});}
+return jsSublist;}
+function getSublistDefinitionCategory()
+{return getIsReadOnlyRecord()?sublistMD.Category.READ_ONLY:sublistMD.Category.REMOTE;}
+function getSublistFields(options)
+{var sublistId=recordUtil.handleOverloadingMethodsForSingleArgument(options,'sublistId',getMissingArgumentErrorMessageFillerValue('getSublistFields'));var allSublistFields=null;var sublistfields=_metadata.getAllSublistFields(sublistId);if(sublistfields)
+{allSublistFields=[];var setOfSublistFields={};var sublistData=getModelController().getCurrentSublistFieldIds(sublistId);if(util.isArray(sublistData))
+{sublistData.forEach(function(fieldId){setOfSublistFields[fieldId]='';});}
+sublistfields.forEach(function(fieldId){setOfSublistFields[fieldId]='';});allSublistFields=Object.keys(setOfSublistFields);}
+return allSublistFields;}
+this.getSublistFields=getSublistFields;function getField(options)
+{var fieldId=recordUtil.handleOverloadingMethodsForSingleArgument(options,'fieldId',getMissingArgumentErrorMessageFillerValue('getField'));return doGetField(undef,fieldId,-1,false);}
+this.getField=getField;function doGetField(sublistId,fieldId,line,useBuffer)
+{var lineInstanceId=getLineInstanceId(sublistId,line,useBuffer);return doGetFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+function doGetFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer)
+{var returnedField;if(getModelController().hasUserFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer))
+{returnedField=getModelController().getUserFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+else
+{var recordField=getCachedRecordFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);returnedField=recordField?fieldMetadata.wrap({delegate:field.create(recordField),category:fieldMetadata.Category.getInstance({isSublistField:sublistId!==undef,isDynamic:getIsDynamicRecord(),isReadOnly:getIsReadOnlyRecord()}),current:getIsCurrentRecord()}):null;getModelController().cacheUserFieldForInstance(sublistId,fieldId,lineInstanceId,returnedField,useBuffer);}
+return returnedField;}
+this.doGetFieldForInstance=doGetFieldForInstance;function getSublistField(options,fieldId,line)
+{var sublistId;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],getMissingArgumentErrorMessageFillerValue('getSublistField'));return doGetSublistField(sublistId,fieldId,line);}
+this.getSublistField=getSublistField;function doGetSublistField(sublistId,fieldId,line)
+{var useBuffer=false;recordUtil.assertValidSublistOperation(isWithinValidLineRangeForFieldOnly(sublistId,line));if(line===doGetLineCount(sublistId)&&isValidSublistField(sublistId,fieldId)){useBuffer=true;}
+return doGetField(sublistId,fieldId,line,useBuffer);}
+function getCurrentSublistField(options,fieldId)
+{var sublistId;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],getMissingArgumentErrorMessageFillerValue('getCurrentSublistField'));return doGetCurrentSublistField(sublistId,fieldId);}
+this.getCurrentSublistField=getCurrentSublistField;function doGetCurrentSublistField(sublistId,fieldId)
+{var lineInstanceId=getModelController().getSublistSelectedLineInstanceId(sublistId);var useBuffer=true;return doGetFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+function getCachedRecordField(sublistId,fieldId,line,useBuffer)
+{var lineInstanceId=getLineInstanceId(sublistId,line,useBuffer);return getCachedRecordFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+this.getCachedRecordField=getCachedRecordField;function getCurrentCachedRecordField(sublistId,fieldId)
+{var lineInstanceId=getModelController().getSublistSelectedLineInstanceId(sublistId);var useBuffer=true;return getCachedRecordFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);}
+this.getCurrentCachedRecordField=getCurrentCachedRecordField;function getCachedRecordFieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer)
+{var recordField=getModelController().getRecordfieldForInstance(sublistId,fieldId,lineInstanceId,useBuffer);if(recordField!=null)
+{if(!!sublistId&&!!lineInstanceId)
+{var lineIndex=getLineIndexFromInstanceId(sublistId,lineInstanceId,useBuffer);recordField.setLine(parseInt(lineIndex,10));}}
+else
+{var fieldConstructorObject=getFieldConstructorObjectForInstance(sublistId,fieldId,lineInstanceId,useBuffer);if(fieldConstructorObject)
+{recordField=recordfield.create(fieldConstructorObject);recordDefinitionEvent.forwardRecordFieldEvents(emitter,that,recordField);getModelController().cacheRecordFieldForInstance(sublistId,fieldId,lineInstanceId,recordField,useBuffer);}
+else
+{recordField=null;}}
+return recordField;}
+this.getCachedRecordFieldForInstance=getCachedRecordFieldForInstance;function flushBufferCacheForFieldStateUpdate(sublistId,fieldId,lineNum,isCurrentLine)
+{var useBuffer=true;var lineInstanceId=null;if(!!sublistId)
+{lineInstanceId=isCurrentLine?getModelController().getSublistSelectedLineInstanceId(sublistId):getLineInstanceId(sublistId,lineNum,useBuffer);}
+getModelController().flushBufferCacheForFieldStateUpdate(sublistId,fieldId,lineInstanceId);}
+this.flushBufferCacheForFieldStateUpdate=flushBufferCacheForFieldStateUpdate;function updateSelectOptions(sublistId,fieldId,line,opts,value,text,selected)
+{getModelController().cacheSelectOptions(sublistId,fieldId,line,opts);getModelController().cacheSelectOptionText(sublistId,fieldId,value,text);if(selected)
+{if(!!sublistId)
+{setCurrentSublistValue(sublistId,fieldId,value);}
+else
+{doSetFieldValue(fieldId,value);}}}
+function getFieldConstructorObjectForInstance(sublistId,fieldId,lineInstanceId,useBuffer)
+{var fieldObj=null;var metadata=_metadata.getFieldMetadata(sublistId,fieldId);if(metadata!=null)
+{var lineIndex=!!sublistId&&!!lineInstanceId?getLineIndexFromInstanceId(sublistId,lineInstanceId,useBuffer):null;var fieldState=!!sublistId?getSublistFieldStateForInstance(sublistId,fieldId,lineInstanceId,useBuffer):getFieldState(fieldId);fieldObj={fieldState:fieldState,metadata:metadata,record:that,isRecordDynamic:getIsDynamicRecord(),isCurrentRecord:getIsCurrentRecord(),sublistId:sublistId,lineNum:lineIndex,recordFunctions:{getRadioSet:getRadioSet,getQueryRequest:getQueryRequest,setInternalEvent:setInternalEvent,isInternal:isInternal,getFieldOptions:getSelectOptionCache,updateSelectOptions:updateSelectOptions}};}
+return fieldObj;}
+function getLineIndexFromInstanceId(sublistId,lineInstanceId,useBuffer)
+{return getModelController().getSublistLineValueForInstance(sublistId,'_sequence',lineInstanceId,useBuffer);}
+function getQueryRequest()
+{var req=slaving.cleanupQueryURL(_metadata.queryUrl);if(getIsCurrentRecord())
+{req.payload.isCurrentRecord=true;}
+return req;}
+function getRadioSet(fieldId)
+{var metadata=_metadata.getFieldMetadata(null,fieldId);return(metadata)?metadata.radioSet:null;}
+function getSelectOptionCache()
+{var selectOptionCache=getModelController().getSelectOptionCache();var result={commitFromSublistBufferToSublist:selectOptionCache.commitFromSublistBufferToSublist,fields:selectOptionCache.fields,get:selectOptionCache.get,getSublist:selectOptionCache.getSublist,getSublistBuffer:selectOptionCache.getSublistBuffer,has:selectOptionCache.has,invalidate:selectOptionCache.invalidate,invalidateSublist:selectOptionCache.invalidateSublist,migrateFromSublistToSublistBuffer:selectOptionCache.migrateFromSublistToSublistBuffer,put:function(sublistId,fieldId,line,newOptions,action,data)
+{if(!action&&!selectOptionCache.has(sublistId,fieldId,line))
+{action='init';data=newOptions;}
+selectOptionCache.put(sublistId,fieldId,line,newOptions);if(!!sublistId&&that.getSublist(sublistId).isMultilineEditable)
+{var lineInstanceId=getLineInstanceId(sublistId,line,true);recordDefinitionEvent.emitUpdateFieldOptions(emitter,that,sublistId,fieldId,line,action,data,that.getSublist(sublistId).isMultilineEditable,lineInstanceId);}
+else
+recordDefinitionEvent.emitUpdateFieldOptions(emitter,that,sublistId,fieldId,line,action,data);},removeLine:selectOptionCache.removeLine};return result;}
+function warnAboutMLBCurrentIndexProblem(msg)
+{if(!!console&&!!console.warn)
+console.warn(msg);}
+function getFieldSelectOption(field,lookupBind)
+{if(field.isPopup())
+{return field.getSelectOptions('','',lookupBind);}
+else
+{return field.getSelectOptions();}}
+this.setMatrixHeaderValue=recordDefinitionEvent.wrapEmitError({record:that,func:matrix.setMatrixHeaderValue.bind(that,that),emitter:emitter});this.getMatrixHeaderValue=matrix.getMatrixHeaderValue.bind(that,that);this.setMatrixSublistValue=recordDefinitionEvent.wrapEmitError({record:that,func:matrix.setMatrixSublistValue.bind(that,that),emitter:emitter});this.getMatrixSublistValue=matrix.getMatrixSublistValue.bind(that,that);this.getMatrixHeaderField=matrix.getMatrixHeaderField.bind(that,that);this.getMatrixSublistField=matrix.getMatrixSublistField.bind(that,that);this.findMatrixSublistLineWithValue=matrix.findMatrixSublistLineWithValue.bind(that,that);this.getMatrixHeaderCount=matrix.getMatrixHeaderCount.bind(that,that);this.setCurrentMatrixSublistValue=recordDefinitionEvent.wrapEmitError({record:that,func:matrix.setCurrentMatrixSublistValue.bind(that,that),emitter:emitter});this.getCurrentMatrixSublistValue=matrix.getCurrentMatrixSublistValue.bind(that,that);this.on=function on(options)
+{var types=options.types,listener=options.listener;utilityFunctions.checkArgs([types,listener],['types','listener'],getMissingArgumentErrorMessageFillerValue('on'));emitter.on({types:types,listener:listener});};this.off=function off(options)
+{var types=options.types,listener=options.listener;utilityFunctions.checkArgs([types,listener],['types','listener'],getMissingArgumentErrorMessageFillerValue('off'));emitter.off({types:types,listener:listener});};function toString(){return constants.RECORD_UNDERLYING_IMPL_NAME.CLIENT_DYNAMIC_RECORD;}
+this.toString=toString;function toJSON()
+{return{id:that.id,type:that.type,isDynamic:that.isDynamic,fields:getModelController().getData().body,sublists:getModelController().getSublistData()};}
+this.toJSON=toJSON;function reCreateExposedRecordProxy(isSubrecord_param,isDynamic_param,isReadOnly_param,isInteractive_param)
+{recordObj.isSubrecord=isSubrecord_param;recordObj.isReadOnly=isReadOnly_param;recordObj.isDynamic=isDynamic_param;return that.proxy({isInteractive:isInteractive_param});}
+this.reCreateExposedRecordProxy=reCreateExposedRecordProxy;(function processOptions(options)
+{implementation=recordImplementation.create(getIsDynamicRecord(),that);_recordRequestContext=options.recordContext;setMetadata(metadata.isInstance(options.metadata)?options.metadata:metadata.create(options.metadata));var shouldTriggerCustomFormLevelScript=getIsCurrentRecord()&&getIsDynamicRecord()&&!!options.formLevelScriptPayload;var formLevelScriptComponent=shouldTriggerCustomFormLevelScript?{libraryScript:options.formLevelScriptPayload,script:options.formLevelScriptMetadata.superScript}:{};var shouldTriggerCustomClientScript=getIsCurrentRecord()&&getIsDynamicRecord()&&!!options.clientScriptPayload;var clientScriptComponent=shouldTriggerCustomClientScript?{libraryScript:options.clientScriptPayload,scriptList:options.clientScriptMetadata.superScriptList,pageMode:options.pageInitMode}:{};setModelController(modelController.isInstance(options.data)?options.data:modelController.create({type:_metadata.type,data:options.data}));setRecordStateController(recordStateController.isInstance(options.state)?options.state:recordStateController.create({metadata:_metadata,data:getModelController(),getModelController:getModelController}));subrecordCompatibility=(function()
+{var result={body:null,sublist:{}};result.body=_metadata.subrecordFieldIds;_metadata.sublistIds.forEach(function(v,i,a)
+{var sublistId=v;result.sublist[sublistId]=_metadata.getAllSublistSubrecordFields(sublistId);});return result;}());v1ScopeOptions=getIsReadOnlyRecord()?null:{record:that,libraryScript:getMetadata().libraryScript,staticScript:getMetadata().staticScript,uiFormScript:getMetadata().uiFormScript,workflowScript:getMetadata().workflowScript,shouldTriggerCustomFormLevelScript:shouldTriggerCustomFormLevelScript,formLevelScriptComponent:formLevelScriptComponent,shouldTriggerCustomClientScript:shouldTriggerCustomClientScript,clientScriptComponent:clientScriptComponent,completePageInit:completePageInit};}(recordObj));this.proxy=recordProxy.proxy.bind(null,this,recordObj);this.internalClone=function()
+{return clone({cloneable:true,mergeable:true});};if(options.cloneable===undefined||!!options.cloneable)
+{this.clone=recordDefinitionEvent.wrapEmitError({record:that,func:function()
+{return clone({cloneable:false,mergeable:true});},emitter:emitter});}
+if(typeof options.merge==='function')
+{this.merge=recordDefinitionEvent.wrapEmitError({record:that,func:options.merge,emitter:emitter});}
+if(getIsSubrecord())
+{this.abandon=subrecord_abandon;this.validate=recordDefinitionEvent.wrapEmitError({record:that,func:subrecord_validate,emitter:emitter});this.setReadonly=subrecord_setReadonly;this.link=subrecord_link;this.linkParentState=subrecord_linkParentState;this.isValidated=subrecord_isValidated;this.setDereferencedFromParent=subrecord_setDereferencedFromParent;this.isDereferencedFromParent=subrecord_isDereferencedFromParent;}
+if(recordObj.initCallback)
+{recordObj.initCallback(that);}
+_recordScriptingV1Scope=v1ScopeOptions?scope.create(v1ScopeOptions):null;implementation.initRecord(that,_recordScriptingV1Scope);function completePageInit()
+{setIsInited();var event={type:recordDefinitionEvent.Type.RECORD_INITIALIZED,record:that};emitter.emit(event);}
+if(getIsReadOnlyRecord())
+completePageInit();return that;}
+return Record;});define('N/record/recordService',['N/common/record/recordDefinition','N/record/recordProxy','N/util'],function(recordDefinition,recordProxy,util)
+{function create(rawRecordOrCreateOptions)
+{var recordOptions=util.extend({},rawRecordOrCreateOptions);var record=create_raw(recordOptions);return record.proxy({isInteractive:recordOptions.isInteractive});}
+function create_raw(recordOptions)
+{recordOptions=util.extend({isClientRecord:true},recordOptions);return new recordDefinition({recordObj:recordOptions});}
+return Object.freeze({create:create,create_raw:create_raw});});define('N/record/recordUtil',['N/record/recordService','N/utilityFunctions','N/record/recordConstants','N/util'],function(recordService,utilityFunctions,constants,util)
+{var undef=undefined;function getEventsParam(options)
+{var result={};result.compress=!!options&&typeof options.compressEvents!=='undefined'?!!options.compressEvents:true;return result;}
+function extractProxyCreateOptions(options)
+{var result={};if(options!==undef&&options!==null)
+{if(util.isBoolean(options.isReadOnly))
+{result.isReadOnly=!!options.isReadOnly;}
+if(util.isBoolean(options.isInteractive))
+{result.isInteractive=!!options.isInteractive;}
+delete options.isReadOnly;delete options.isInteractive;}
+return result;}
+function createRecordInstance(nsrecord,doNotProxy)
+{var record;if(!!doNotProxy)
+{record=recordService.create_raw(nsrecord);}
+else
+{record=recordService.create(nsrecord);}
+return record;}
+function getCreateParams(options,isPromise)
+{var type,defaultValues,isCurrent,events=getEventsParam(options);if(options!==undef&&options!==null)
+{type=options.type;defaultValues=options.isDynamic?{recordmode:'dynamic'}:{};util.extend(defaultValues,options.defaultValues||{});isCurrent=options.isCurrent||false;}
+var moduleName=(isPromise)?'create.promise':'create';utilityFunctions.checkArgs([type],['type'],moduleName);return{type:type,defaults:defaultValues,current:isCurrent,compressEvents:events.compress};}
+function doCreateRecord(createArgs,nsrecord,isPromise){return doCreateRecord_impl(createArgs,nsrecord,isPromise,false);}
+function doCreateRecord_raw(createArgs,nsrecord,isPromise){return doCreateRecord_impl(createArgs,nsrecord,isPromise,true);}
+function doCreateRecord_impl(createArgs,nsrecord,isPromise,doNotProxy)
+{if(nsrecord.data)
+{nsrecord.data.initialization={method:'createRecord',params:createArgs};if(!isPromise)
+{nsrecord.data.initialization.remoteId=nsrecord.remoteId;}}
+var record=createRecordInstance(nsrecord,doNotProxy);utilityFunctions.assertTrue(createArgs.type.toLowerCase()===record.type.toLowerCase(),'SSS_RECORD_TYPE_MISMATCH');return record;}
+function getCopyParams(options,isPromise)
+{var type,id,defaultValues,events=getEventsParam(options);if(options!==undef&&options!==null)
+{type=options.type;id=options.id;defaultValues=options.isDynamic?{recordmode:'dynamic'}:{};util.extend(defaultValues,options.defaultValues||{});}
+var moduleName=(isPromise)?'copy.promise':'copy';utilityFunctions.checkArgs([type,id],['type','id'],moduleName);return{type:type,id:String(id),defaults:defaultValues,compressEvents:events.compress};}
+function validateCopyRecord(type,record)
+{utilityFunctions.assertTrue(type.toLowerCase()===record.type.toLowerCase()||(type.toLowerCase()==='customer'&&/(prospect|lead|customer)/.test(record.type.toLowerCase())),'SSS_RECORD_TYPE_MISMATCH');}
+function doCopyRecord(copyArgs,nsrecord,isPromise){return doCopyRecord_impl(copyArgs,nsrecord,isPromise,false);}
+function doCopyRecord_raw(copyArgs,nsrecord,isPromise){return doCopyRecord_impl(copyArgs,nsrecord,isPromise,true);}
+function doCopyRecord_impl(copyArgs,nsrecord,isPromise,doNotProxy)
+{if(nsrecord.data)
+{nsrecord.data.initialization={method:'copyRecord',params:copyArgs};if(!isPromise)
+{nsrecord.data.initialization.remoteId=nsrecord.remoteId;}}
+var record=createRecordInstance(nsrecord,doNotProxy);validateCopyRecord(copyArgs.type,record);return record;}
+function getLoadParams(options,isPromise)
+{var type,id,defaultValues,isCurrent,events=getEventsParam(options);if(options!==undef&&options!==null)
+{type=options.type;id=options.id;defaultValues=options.isDynamic?{recordmode:'dynamic'}:{};util.extend(defaultValues,options.defaultValues||{});isCurrent=options.isCurrent||false;}
+var moduleName=(isPromise)?'load.promise':'load';utilityFunctions.checkArgs([type,id],['type','id'],moduleName);return{type:type,id:String(id),defaults:defaultValues,current:isCurrent,compressEvents:events.compress};}
+function validateLoadRecord(type,record)
+{utilityFunctions.assertTrue(type.toLowerCase()===record.type.toLowerCase()||(type.toLowerCase()==='assemblyitem'&&/.*assemblyitem/.test(record.type.toLowerCase()))||(type.toLowerCase()==='inventoryitem'&&/.*inventoryitem/.test(record.type.toLowerCase()))||(type.toLowerCase()==='customer'&&/(prospect|lead|customer)/.test(record.type.toLowerCase())),'SSS_RECORD_TYPE_MISMATCH');}
+function doLoadRecord(loadArgs,nsrecord,isPromise){return doLoadRecord_impl(loadArgs,nsrecord,isPromise,false);}
+function doLoadRecord_raw(loadArgs,nsrecord,isPromise){return doLoadRecord_impl(loadArgs,nsrecord,isPromise,true);}
+function doLoadRecord_impl(loadArgs,nsrecord,isPromise,doNotProxy)
+{if(nsrecord.data)
+{nsrecord.data.initialization={method:'loadRecord',params:loadArgs};if(!isPromise)
+{nsrecord.data.initialization.remoteId=nsrecord.remoteId;}}
+var record=createRecordInstance(nsrecord,doNotProxy);validateLoadRecord(loadArgs.type,record);return record;}
+function getTransformParams(options,isPromise)
+{var fromType,fromId,toType,defaultValues,events=getEventsParam(options);if(options!==undef&&options!==null)
+{fromType=options.fromType;fromId=options.fromId;toType=options.toType;defaultValues=options.isDynamic?{recordmode:'dynamic'}:{};util.extend(defaultValues,options.defaultValues||{});}
+var moduleName=(isPromise)?'transform.promise':'transform';utilityFunctions.checkArgs([fromType,fromId,toType],['fromType','fromId','toType'],moduleName);return{type:fromType,id:String(fromId),transformType:toType,defaults:defaultValues,compressEvents:events.compress};}
+function doTransformRecord(transformArgs,nsrecord,isPromise){return doTransformRecord_impl(transformArgs,nsrecord,isPromise,false);}
+function doTransformRecord_raw(transformArgs,nsrecord,isPromise){return doTransformRecord_impl(transformArgs,nsrecord,isPromise,true);}
+function doTransformRecord_impl(transformArgs,nsrecord,isPromise,doNotProxy)
+{if(nsrecord.data)
+{nsrecord.data.initialization={method:'transformRecord',params:transformArgs};if(isPromise)
+{nsrecord.data.initialization.remoteId=nsrecord.remoteId;}}
+var record=createRecordInstance(nsrecord,doNotProxy);utilityFunctions.assertTrue(transformArgs.transformType.toLowerCase()===record.type.toLowerCase(),'SSS_RECORD_TYPE_MISMATCH');return record;}
+function getDeleteParams(options,isPromise)
+{var type,id;if(options!==undef&&options!==null)
+{type=options.type;id=options.id;}
+var moduleName=(isPromise)?'delete.promise':'delete';utilityFunctions.checkArgs([type,id],['type','id'],moduleName);return{type:type,id:String(id)};}
+function doDeleteRecord(recordId)
+{return parseInt(recordId,10);}
+function getSubmitFieldsParams(option,isPromise)
+{option=option||{};var type=option.type,id=option.id,values=option.values,options=option.options;var moduleName=(isPromise)?'submitFields.promise':'submitFields';utilityFunctions.checkArgs([type,id,values],['type','id','values'],moduleName);var submitOptions={enablesourcing:(utilityFunctions.isObject(options)&&options['enableSourcing']===true)?true:false,disabletriggers:(utilityFunctions.isObject(options)&&options['disableTriggers']===true)?true:false,ignoremandatoryfields:(utilityFunctions.isObject(options)&&options['ignoreMandatoryFields']===true)?true:false};var flds=[],vals=[];for(var field in values)
+{if(values.hasOwnProperty(field))
+{flds[flds.length]=field;vals[vals.length]=values[field];}}
+flds=flds.length>0?flds:null;vals=vals.length>0?vals:null;return[type,id,flds,vals,submitOptions];}
+function doSubmitFields(submitResponse)
+{return parseInt(submitResponse,10);}
+function getAttachParams(options,isPromise)
+{var record=options.record,to=options.to,attributes=options.attributes||null;var moduleName=(isPromise)?'attach.promise':'attach';utilityFunctions.checkArgs([record,to],['record','to'],moduleName);var recordType=options.record.type,recordId=options.record.id,toType=options.to.type,toId=options.to.id;utilityFunctions.checkArgs([recordType,recordId,toType,toId],['record.type','record.id','to.type','to.id'],moduleName);return[recordType,recordId,toType,toId,attributes];}
+function getDetachParams(options,isPromise)
+{var record=options.record,from=options.from,attributes=options.attributes||null;var moduleName=(isPromise)?'detach.promise':'detach';utilityFunctions.checkArgs([record,from],['record','from'],moduleName);var recordType=options.record.type,recordId=options.record.id,fromType=options.from.type,fromId=options.from.id;utilityFunctions.checkArgs([recordType,recordId,fromType,fromId],['record.type','record.id','from.type','from.id'],moduleName);return[recordType,recordId,fromType,fromId,attributes];}
+return Object.freeze({extractProxyCreateOptions:extractProxyCreateOptions,getCreateParams:getCreateParams,doCreateRecord:doCreateRecord,doCreateRecord_raw:doCreateRecord_raw,getCopyParams:getCopyParams,doCopyRecord:doCopyRecord,doCopyRecord_raw:doCopyRecord_raw,getLoadParams:getLoadParams,doLoadRecord:doLoadRecord,doLoadRecord_raw:doLoadRecord_raw,getTransformParams:getTransformParams,doTransformRecord:doTransformRecord,doTransformRecord_raw:doTransformRecord_raw,getDeleteParams:getDeleteParams,doDeleteRecord:doDeleteRecord,getSubmitFieldsParams:getSubmitFieldsParams,doSubmitFields:doSubmitFields,getAttachParams:getAttachParams,getDetachParams:getDetachParams});});define('N/record/recordImpl',['N/restricted/recordApi','N/restricted/invoker','N/record/recordUtil'],function(api,invoker,recordUtil)
+{function createRecord(options){return createRecord_impl(options,true);}
+function createRecord_raw(options){return createRecord_impl(options,false);}
+function createRecord_impl(options,doCreateProxy)
+{var proxyOptions=recordUtil.extractProxyCreateOptions(options);var createArgs=recordUtil.getCreateParams(options,false);var nsrecord=invoker(api,'createRecord',[createArgs.type,createArgs.defaults]);if(!doCreateProxy)
+{return recordUtil.doCreateRecord_raw(createArgs,nsrecord,false);}
+else
+{return recordUtil.doCreateRecord(createArgs,util.extend(nsrecord,proxyOptions),false);}}
+function copyRecord(options){return copyRecord_impl(options,true);}
+function copyRecord_raw(options){return copyRecord_impl(options,false);}
+function copyRecord_impl(options,doCreateProxy)
+{var proxyOptions=recordUtil.extractProxyCreateOptions(options);var copyArgs=recordUtil.getCopyParams(options,false);var nsrecord=invoker(api,'copyRecord',[copyArgs.type,copyArgs.id,copyArgs.defaults]);if(!doCreateProxy)
+{return recordUtil.doCopyRecord_raw(copyArgs,nsrecord,false);}
+else
+{return recordUtil.doCopyRecord(copyArgs,util.extend(nsrecord,proxyOptions),false);}}
+function loadRecord(options){return loadRecord_impl(options,true);}
+function loadRecord_raw(options){return loadRecord_impl(options,false);}
+function loadRecord_impl(options,doCreateProxy)
+{var proxyOptions=recordUtil.extractProxyCreateOptions(options);var loadArgs=recordUtil.getLoadParams(options,false);var nsrecord=invoker(api,'loadRecord',[loadArgs.type,loadArgs.id,loadArgs.defaults]);if(!doCreateProxy)
+{return recordUtil.doLoadRecord_raw(loadArgs,nsrecord,false);}
+else
+{return recordUtil.doLoadRecord(loadArgs,util.extend(nsrecord,proxyOptions),false);}}
+function transformRecord(options){return transformRecord_impl(options,true);}
+function transformRecord_raw(options){return transformRecord_impl(options,false);}
+function transformRecord_impl(options,doCreateProxy)
+{var proxyOptions=recordUtil.extractProxyCreateOptions(options);var transformArgs=recordUtil.getTransformParams(options,false);var nsrecord=invoker(api,'transformRecord',[transformArgs.type,transformArgs.id,transformArgs.transformType,transformArgs.defaults]);if(!doCreateProxy)
+{return recordUtil.doTransformRecord_raw(transformArgs,nsrecord,false);}
+else
+{return recordUtil.doTransformRecord(transformArgs,util.extend(nsrecord,proxyOptions),false);}}
+return Object.freeze({create:createRecord,create_raw:createRecord_raw,load:loadRecord,load_raw:loadRecord_raw,copy:copyRecord,copy_raw:copyRecord_raw,transform:transformRecord,transform_raw:transformRecord_raw});});define('N/record',['N/restricted/recordApi','N/restricted/invoker','N/record/recordImpl','N/record/recordUtil','N/record/recordEvent'],function(api,invoker,recordImpl,recordUtil,recordEvent)
+{var recordTypes;function createRecord(options){return recordImpl.create(options);}
+createRecord.promise=function createRecordPromise(options)
+{return new Promise(function(resolve,reject)
+{try
+{var createArgs=recordUtil.getCreateParams(options,true);invoker(api,'createRecord',[createArgs.type,createArgs.defaults],callback);}
+catch(e)
+{reject(e);}
+function callback(result,exception)
+{if(exception)
+{reject(exception);return;}
+try
+{resolve(recordUtil.doCreateRecord(createArgs,result,true));}
+catch(e)
+{reject(e);}}});};function copyRecord(options){return recordImpl.copy(options);}
+copyRecord.promise=function copyRecordPromise(options)
+{return new Promise(function(resolve,reject)
+{try
+{var copyArgs=recordUtil.getCopyParams(options,true);invoker(api,'copyRecord',[copyArgs.type,copyArgs.id,copyArgs.defaults],callback);}
+catch(e)
+{reject(e);}
+function callback(result,exception)
+{if(exception)
+{reject(exception);return;}
+try
+{resolve(recordUtil.doCopyRecord(copyArgs,result,true));}
+catch(e)
+{reject(e);}}});};function loadRecord(options){return recordImpl.load(options);}
+loadRecord.promise=function loadRecordPromise(options)
+{return new Promise(function(resolve,reject)
+{try
+{var args=recordUtil.getLoadParams(options,true);invoker(api,'loadRecord',[args.type,args.id,args.defaults],callback);}
+catch(e)
+{reject(e);}
+function callback(result,exception)
+{if(exception)
+{reject(exception);return;}
+try
+{resolve(recordUtil.doLoadRecord(args,result,true));}
+catch(e)
+{reject(e);}}});};function transformRecord(options){return recordImpl.transform(options);}
+transformRecord.promise=function transformRecordPromise(options)
+{return new Promise(function(resolve,reject)
+{try
+{var transformArgs=recordUtil.getTransformParams(options,true);invoker(api,'transformRecord',[transformArgs.type,transformArgs.id,transformArgs.transformType,transformArgs.defaults],callback);}
+catch(e)
+{reject(e);}
+function callback(result,exception)
+{if(exception)
+{reject(exception);return;}
+try
+{resolve(recordUtil.doTransformRecord(transformArgs,result,true));}
+catch(e)
+{reject(e);}}});};function deleteRecord(options)
+{var deleteArgs=recordUtil.getDeleteParams(options,false);var recordID=invoker(api,'nlapiDeleteRecord',[deleteArgs.type,deleteArgs.id,null]);return recordUtil.doDeleteRecord(recordID);}
+deleteRecord.promise=function deleteRecordPromise(options)
+{return new Promise(function(resolve,reject)
+{try
+{var args=recordUtil.getDeleteParams(options,true);invoker(api,'nlapiDeleteRecord',[args.type,args.id,null],callback);}
+catch(e)
+{reject(e);}
+function callback(result,exception)
+{if(exception)
+{reject(exception);return;}
+try
+{resolve(recordUtil.doDeleteRecord(args,result));}
+catch(e)
+{reject(e);}}});};function submitFields(options)
+{var argList=recordUtil.getSubmitFieldsParams(options,false);var submitResponse=invoker(api,'nlapiSubmitField',argList);return recordUtil.doSubmitFields(submitResponse);}
+submitFields.promise=function submitFieldsPromise(options)
+{return new Promise(function(resolve,reject)
+{try
+{var argList=recordUtil.getSubmitFieldsParams(options,true);invoker(api,'nlapiSubmitField',argList,callback);}
+catch(e)
+{reject(e);}
+function callback(result,exception)
+{if(exception)
+{reject(exception);return;}
+try
+{resolve(recordUtil.doSubmitFields(result));}
+catch(e)
+{reject(e);}}});};function attachRecord(options)
+{var argList=recordUtil.getAttachParams(options,false);invoker(api,'nlapiAttachRecord',argList);}
+attachRecord.promise=function attachRecordPromise(options)
+{return new Promise(function(resolve,reject)
+{try
+{var argList=recordUtil.getAttachParams(options,true);invoker(api,'nlapiAttachRecord',argList,callback);}
+catch(e)
+{reject(e);}
+function callback(result,exception)
+{if(exception)
+{reject(exception);return;}
+try
+{resolve();}
+catch(e)
+{reject(e);}}});};function detachRecord(options)
+{var argList=recordUtil.getDetachParams(options,false);invoker(api,'nlapiDetachRecord',argList);}
+detachRecord.promise=function detachRecordPromise(options)
+{return new Promise(function(resolve,reject)
+{try
+{var argList=recordUtil.getDetachParams(options,true);invoker(api,'nlapiDetachRecord',argList,callback);}
+catch(e)
+{reject(e);}
+function callback(result,exception)
+{if(exception)
+{reject(exception);return;}
+try
+{resolve();}
+catch(e)
+{reject(e);}}});};return Object.freeze({Event:recordEvent.Type,create:createRecord,load:loadRecord,copy:copyRecord,transform:transformRecord,'delete':deleteRecord,submitFields:submitFields,attach:attachRecord,detach:detachRecord,get Type()
+{if(!recordTypes)
+{recordTypes=invoker(api,'getRecordTypeEnumMap',[]);}
+return recordTypes;}});});define('N/currentRecordBootstrap',['N/record/recordService','N/error','N/utilityFunctions','N/environment','N/msgRouter'],function(recordService,error,utilityFunctions,environment,msgRouter)
+{var undef=undefined;function isSuiteScriptError(obj)
+{return(obj&&obj.toJSON&&obj.toJSON().type==='error.SuiteScriptError')||(obj&&obj.constructor&&obj.constructor.name==='nlobjError');}
+var currentRecord=undef;function getCurrentRecord()
+{return currentRecord;}
+function getModuleInstance(rawRecord)
+{var currentRecordModule={};var toRet;if(!isSuiteScriptError(rawRecord))
+{try
+{environment.setInNewUI();var isInteractive=true;rawRecord.isClientRecord=true;rawRecord.isCurrentRecord=true;rawRecord.isInteractive=isInteractive;rawRecord.data=rawRecord.data||{};rawRecord.data.initialization={method:rawRecord.id?'loadRecord':'createRecord',params:{type:rawRecord.metadata.recordType,defaults:{}}};rawRecord.initCallback=function initCallback(recordBeingCreated)
+{currentRecord=recordBeingCreated.proxy({isInteractive:isInteractive});};toRet=recordService.create(rawRecord);currentRecord=toRet;msgRouter.showMessagesFromBeforeLoad({currentRecord:currentRecord});}
+catch(err)
+{if(err.csError!=null)
+toRet=err;else
+toRet=utilityFunctions.createSuiteScriptError(error.Type.CANNOT_CREATE_RECORD_INSTANCE);currentRecord=undef;}}
+else
+{if(rawRecord===null||rawRecord===undef)
+{toRet=utilityFunctions.createSuiteScriptError(error.Type.CANNOT_CREATE_RECORD_INSTANCE);}
+else
+{toRet=rawRecord;}}
+currentRecordModule.get=function()
+{if(isSuiteScriptError(toRet))
+{throw toRet;}
+return toRet;};currentRecordModule.get.promise=function()
+{return new Promise(function(resolve,reject)
+{if(isSuiteScriptError(toRet))
+{reject(toRet);}
+else
+{resolve(toRet);}});};return utilityFunctions.freezeObjectIfPossible(currentRecordModule);}
+return{getModuleInstance:getModuleInstance,getCurrentRecord:getCurrentRecord}});define('N/currentRecord/currentField',['N/nsobject','N/error','N/utilityFunctions','N/fieldUtil'],function(nsobject,error,utilityFunctions,fieldUtil){function nlobjFieldCurrentRecordField(fieldObj)
+{Object.defineProperty(this,'label',{get:function()
+{return fieldObj.getLabel();},set:function(label)
+{var sublistId=fieldObj.getSubList();if(!sublistId)
+{setLabel(fieldObj.getName()+"_fs",label);fieldObj.label=label;}
+else
+{if(hasMachine(sublistId))
+{var mch=eval(String(sublistId)+'_machine');var fldnam=fieldObj.getName();var possibleLabel=mch.getFormElementLabel(mch.getArrayPosition(fldnam));var useDisplay=false;if(possibleLabel==="")
+{var displayLabel=mch.getFormElementLabel(mch.getArrayPosition(fldnam+"_display"));if(displayLabel!==""&&displayLabel!==undefined)
+{fieldObj.label=label;mch.setFormElementLabel(fldnam+"_display",label);window.lineitemFieldlabelArray[sublistId][fldnam]=label;window.lineitemFieldlabelArray[sublistId][fldnam+"_display"]=label;}}
+else if(possibleLabel!==undefined)
+{fieldObj.label=label;mch.setFormElementLabel(fldnam,label);window.lineitemFieldlabelArray[sublistId][fldnam]=label;}}
+else
+{}}},enumerable:true,configurable:false});Object.defineProperty(this,'id',{get:function()
+{return fieldObj.getName();},set:function(val)
+{utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'id');},enumerable:true,configurable:false});Object.defineProperty(this,'type',{get:function()
+{return fieldObj.getType();},set:function(val)
+{utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'type');},enumerable:true,configurable:false});Object.defineProperty(this,'sublistId',{get:function()
+{return fieldObj.getSubList();},set:function(val)
+{utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'sublistId');},enumerable:true,configurable:false});Object.defineProperty(this,'isMandatory',{get:function()
+{return!!fieldObj.isMandatory();},set:function(required)
+{if(!fieldObj.getSubList())
+{var fldnam=fieldObj.getName();var form=typeof(ftabs)!='undefined'&&ftabs[getFieldName(fldnam)]!=null?document.forms[ftabs[getFieldName(fldnam)]+'_form']:document.forms['main_form'];if(nsapiIsInternal()||/cust(entity|item|body|column|record|itemnumber|page|event).+/.test(fldnam))
+setRequired(getFormElement(form,getFieldName(fldnam)),required);fieldObj.required=required;}},enumerable:true,configurable:false});Object.defineProperty(this,'isDisabled',{get:function()
+{return!!fieldObj.isDisabled();},set:function(val)
+{var sublist=fieldObj.getSubList();var fldnam=fieldObj.getName();if(!sublist)
+{var form=typeof(ftabs)!='undefined'&&ftabs[getFieldName(fldnam)]!=null?document.forms[ftabs[getFieldName(fldnam)]+'_form']:document.forms['main_form'];disableField(getFormElement(form,getFieldName(fldnam)),val);if(typeof(ftabs)=='undefined'||ftabs[getFieldName(fldnam)]==null||ftabs[getFieldName(fldnam)]=="main")
+nsDisabledFields[fldnam]=val;}
+else
+{var fld=getFormElement(document.forms[sublist.toLowerCase()+'_form'],getFieldName(fldnam));if(fld==null)
+fld=getFormElement(document.forms[sublist.toLowerCase()+'_form'],getFieldName(fldnam)+fieldObj.getLine())
+disableField(fld,val);}
+fieldObj.disabled=val;},enumerable:true,configurable:false});Object.defineProperty(this,'isPopup',{get:function()
+{return!!fieldObj.isPopup();},set:function(val)
+{utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'isPopup');},enumerable:true,configurable:false});Object.defineProperty(this,'isDisplay',{get:function()
+{return!!fieldObj.isDisplay();},set:function(show)
+{var sublist=fieldObj.getSubList();var fldnam=fieldObj.getName();if(!sublist)
+{showFieldAndLabel(fldnam+"_fs",show)
+if(typeof(ftabs)!='undefined')
+{var tabName=ftabs[getFieldName(fldnam)];ns_tabUtils.updateTabVisibility(tabName);}
+fieldObj.display=show;}},enumerable:true,configurable:false});Object.defineProperty(this,'isVisible',{get:function()
+{return!!fieldObj.isVisible();},set:function(show)
+{if(!fieldObj.getSubList())
+{setFieldAndLabelVisibility(fieldObj.getName()+"_fs",show);fieldObj.visible=show;}},enumerable:true,configurable:false});Object.defineProperty(this,'isReadOnly',{get:function()
+{return!!fieldObj.isReadOnly();},set:function(val)
+{if(!fieldObj.getSubList())
+{var fldnam=fieldObj.getName();var form=typeof(ftabs)!='undefined'&&ftabs[getFieldName(fldnam)]!=null?document.forms[ftabs[getFieldName(fldnam)]+'_form']:document.forms['main_form'];var fld=getFormElement(form,getFieldName(fldnam));if(fld!=null)
+{if(fieldObj.getType()!=="textarea")
+{utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'isReadOnly');}
+else
+{setFieldReadOnly(fld,val);fieldObj.readonly=!!fld.readOnly;}}}},enumerable:true,configurable:false});if(fieldUtil.isSelectType(fieldObj.getType()))
+{this.getSelectOptions=getSelectOptions;this.insertSelectOption=insertSelectOption;this.removeSelectOption=removeSelectOption;}
+function getSelectOptions(filter,filteroperator)
+{if(utilityFunctions.isObject(filter))
+{filteroperator=filter.operator;filter=filter.filter;}
+var sOptions=[];var uiField=fieldObj.getUIField();var dropdown=(fieldObj.getType()==="select")?getDropdown(uiField):getMultiDropdown(uiField);if(dropdown)
+{var optionValues=dropdown.valueArray;var optionTexts=dropdown.textArray;var filterfunction=null;if(!!filter)
+{filteroperator=filteroperator||"contains";if(filteroperator==="is")
+{filterfunction=function(v){return(""+v).length===filter.length&&(""+v).search(new RegExp(filter,"i"))===0;};}
+else if(filteroperator==="startswith")
+{filterfunction=function(v){return(""+v).search(new RegExp(filter,"i"))===0;}}
+else if(filteroperator==="contains")
+{filterfunction=function(v){return(""+v).search(new RegExp(filter,"i"))!==-1;}}}
+for(var i in optionValues)
+{if((filterfunction===null)||filterfunction(optionTexts[i]))
+sOptions[sOptions.length]={value:optionValues[i],text:optionTexts[i]};}}
+return sOptions;}
+function insertSelectOption(options,text)
+{var value,selected=false,undef=undefined;if(text!==undef)
+{value=options;}
+else if(options!==undef&&options!==null)
+{value=options.value;text=options.text;selected=options.isSelected||false;}
+fieldUtil.verifyPrefixedWithCustPage(fieldObj.getName());utilityFunctions.checkArgs([value,text],['value','text'],'CurrentField.insertSelectOption');var uiField=fieldObj.getUIField();var isSingleSelect=(fieldObj.getType()==="select");var dropdown=isSingleSelect?getDropdown(uiField):getMultiDropdown(uiField);if(dropdown==null)
+return;if(isSingleSelect)
+{dropdown.addOption(text,value);if(selected){var newIdx=dropdown.getIndexForValue(value);dropdown.setIndex(newIdx,true);}}
+else
+{dropdown.addOption(text,value,selected);}}
+function removeSelectOption(options)
+{var undef=undefined,value=((options!==undef)&&(options!==null)&&(options.value!==undef))?options.value:options;fieldUtil.verifyPrefixedWithCustPage(fieldObj.getName());var uiField=fieldObj.getUIField();var dropdown=(fieldObj.getType()==="select")?getDropdown(uiField):getMultiDropdown(uiField);if(value!==null){utilityFunctions.checkArgs([value],['value'],'CurrentField.removeSelectOption');dropdown.deleteOneOption(value);}
+else
+dropdown.deleteAllOptions();}}
+function pojsoCurrentRecordField(fieldObj)
+{var internalField={};Object.defineProperty(this,'label',{get:function(){return fieldObj.label;},set:function(value){utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'label');},enumerable:true,configurable:false});Object.defineProperty(this,'id',{get:function(){return fieldObj.name;},set:function(value){utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'id');},enumerable:true,configurable:false});Object.defineProperty(this,'type',{get:function(){return fieldObj.type;},set:function(value){utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'type');},enumerable:true,configurable:false});Object.defineProperty(this,'sublistId',{get:function(){return fieldObj.machinename;},set:function(value){utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'sublistId');},enumerable:true,configurable:false});Object.defineProperty(this,'isMandatory',{get:function(){return fieldObj.required;},set:function(value){utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'isMandatory');},enumerable:true,configurable:false});Object.defineProperty(this,'isDisabled',{get:function(){return fieldObj.isDisabled;},set:function(value){utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'isDisabled');},enumerable:true,configurable:false});Object.defineProperty(this,'isPopup',{get:function(){return fieldObj.isPopup;},set:function(value){utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'isPopup');},enumerable:true,configurable:false});Object.defineProperty(this,'isDisplay',{get:function(){return fieldObj.isDisplay;},set:function(value){utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'isDisplay');},enumerable:true,configurable:false});Object.defineProperty(this,'isVisible',{get:function(){return fieldObj.isVisible;},set:function(value){utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'isVisible');},enumerable:true,configurable:false});Object.defineProperty(this,'isReadOnly',{get:function(){return fieldObj.readonly;},set:function(value){utilityFunctions.throwSuiteScriptError(error.Type.READ_ONLY_PROPERTY,'isReadOnly');},enumerable:true,configurable:false});this.getSelectOptions=fieldObj.getSelectOptions;this.insertSelectOption=fieldObj.insertSelectOption;this.removeSelectOption=fieldObj.removeSelectOption;}
+function CurrentRecordField(fieldObj)
+{var that=this,internalField=fieldObj instanceof nlobjField?new nlobjFieldCurrentRecordField(fieldObj):new pojsoCurrentRecordField(fieldObj);Object.defineProperty(this,'label',{get:function(){return internalField.label;},set:function(value){internalField.label=value;},enumerable:true,configurable:false});Object.defineProperty(this,'id',{get:function(){return internalField.id;},set:function(value){internalField.id=value;},enumerable:true,configurable:false});Object.defineProperty(this,'type',{get:function(){return internalField.type;},set:function(value){internalField.type=value;},enumerable:true,configurable:false});Object.defineProperty(this,'sublistId',{get:function(){return internalField.sublistId;},set:function(value){internalField.sublistId=value;},enumerable:true,configurable:false});Object.defineProperty(this,'isMandatory',{get:function(){return internalField.isMandatory;},set:function(value){internalField.isMandatory=value;},enumerable:true,configurable:false});Object.defineProperty(this,'isDisabled',{get:function(){return internalField.isDisabled;},set:function(value){return internalField.isDisabled=value;},enumerable:true,configurable:false});Object.defineProperty(this,'isPopup',{get:function(){return internalField.isPopup;},set:function(value){return internalField.isPopup=value;},enumerable:true,configurable:false});Object.defineProperty(this,'isDisplay',{get:function(){return internalField.isDisplay;},set:function(value){return internalField.isDisplay=value;},enumerable:true,configurable:false});Object.defineProperty(this,'isVisible',{get:function(){return internalField.isVisible;},set:function(value){return internalField.isVisible=value;},enumerable:true,configurable:false});Object.defineProperty(this,'isReadOnly',{get:function(){return internalField.isReadOnly;},set:function(value){internalField.isReadOnly=value;},enumerable:true,configurable:false});this.getSelectOptions=internalField.getSelectOptions;this.insertSelectOption=internalField.insertSelectOption;this.removeSelectOption=internalField.removeSelectOption;this.toJSON=function()
+{return{id:that.id,label:that.label,type:that.type,sublistId:that.sublistId,isMandatory:that.isMandatory,isDisabled:that.isDisabled,isPopup:that.isPopup,isDisplay:that.isDisplay,isVisible:that.isVisible,isReadOnly:that.isReadOnly};};this.toString=function()
+{return "currentRecordField";};}
+CurrentRecordField.prototype=nsobject.getNewInstance();Object.freeze(CurrentRecordField);return Object.freeze({create:function(fieldObj)
+{return!fieldObj?null:new CurrentRecordField(fieldObj);},isSelectType:fieldUtil.isSelectType,Type:fieldUtil.SELECT_FIELD_TYPES});});define('N/currentRecord/currentSublist',['N/nsobject','N/error','N/utilityFunctions'],function(nsobject,error,utilityFunctions){var SUBLIST_TYPE=Object.freeze({INLINE_EDITOR:'inlineeditor',EDITOR:'editor',STATIC_LIST:'staticlist',LIST:'list'});function CurrentRecordSublist(sublistObj)
+{this.getFieldLabel=function(options)
+{var fieldId=options.fieldId;var sublistName=sublistObj.getName();if(hasMachine(sublistName))
+{var mch=eval(String(sublistName)+'_machine');return mch.getFormElementLabel(mch.getArrayPosition(fieldId));}
+return null;};this.setFieldLabel=function(options)
+{var fieldId=options.fieldId;var label=options.label;var sublistName=sublistObj.getName();if(isEditMachine(sublistName))
+{var mch=eval(String(sublistName)+'_machine');mch.setFormElementLabel(fieldId,label);}};this.getName=function(){return sublistObj.getName();};this.getType=function(){return sublistObj.getType();};this.isHidden=function(){return sublistObj.isHidden();};this.isDisplay=function(){return sublistObj.isDisplay();};this.isMultilineEditable=function(){return false;};this.isChanged=function(){return wasMachineChanged(sublistObj.getName());};this.isCurrentLineChanged=function(){return isMachineChanged(sublistObj.getName());};this.getColumn=function(options)
+{var undef=undefined,fieldId=options!==undef&&options!==null&&options.fieldId!==undef?options.fieldId:options,returnMe=null;utilityFunctions.checkArgs([fieldId],['fieldId'],'CurrentSublist.getColumn');var fieldInfo=nlapiGetLineItemField(sublistObj.getName(),fieldId);if(fieldInfo!==null)
+{returnMe={getName:function(){return fieldInfo.name;},getType:function(){return fieldInfo.type;},getLabel:function(){return fieldInfo.label;},setLabel:function(){},getSublistId:function(){return sublistObj.getName()}};}
+return returnMe;};this.toJSON=function()
+{return{id:this.getName(),type:this.getType(),isChanged:this.isChanged(),isDisplay:this.isDisplay()};};this.toString=function()
+{return "currentRecordSublist";};}
+CurrentRecordSublist.prototype=nsobject.getNewInstance();Object.freeze(CurrentRecordSublist);return Object.freeze({create:function(sublistObj){return new CurrentRecordSublist(sublistObj);},Type:SUBLIST_TYPE});});define('N/currentRecord/currentSubrecord',['N/utilityFunctions','N/error','N/util/formatter','N/currentRecord/currentField','N/currentRecord/currentSublist','N/record/recordUtilityFunctions','N/record/recordProxy','N/record/recordConstants'],function(utilityFunctions,error,formatter,field,sublist,recordUtil,recordProxy,constants)
+{function CurrentSubrecord(subrecordParent,subrecordObj)
+{var subrecordParent=subrecordParent;var recordOptions={isClientRecord:true,isDynamic:true,isReadOnly:false,isCurrentRecord:true,isSubrecord:true};var that=this;this.id=null;this.type=null;this.isDynamic=true;this.toJSON=function()
+{var result={};result.type=this.type;result.id=this.id;result.isDynamic=true;result.fields=subrecordObj.recordmanager.getFieldNames().reduce(function(p,c,i,a)
+{p[c]=subrecordObj.recordmanager.getFieldValue(c);return p;},{});return result;};function toString()
+{return constants.RECORD_UNDERLYING_IMPL_NAME.DOM_CURRENT_SUBRECORD;}
+this.toString=toString;this.removeField=function(options)
+{var undef=undefined,fieldId;fieldId=options!==undef&&options!==null&&options.fieldId!==undef?options.fieldId:options;utilityFunctions.checkArgs([fieldId],['fieldId'],'CurrentSubrecord.removeField');utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.removeField');};this.getFields=function()
+{return subrecordObj.recordmanager.getFieldNames();};this.getSublists=function()
+{utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.getSublists');};this.getSublistFields=function(options)
+{var undef=undefined,result,sublistId,sublist;sublistId=options!==undef&&options!==null&&options.sublistId!==undef?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],'CurrentSubrecord.getValue');sublist=subrecordObj.getChildMachineRecordManager(sublistId);result=!!sublist&&sublist.getFieldNames()||null;return result;};this.getValue=function(options)
+{var undef=undefined,fieldId,value,field;fieldId=options!==undef&&options!==null&&options.fieldId!==undef?options.fieldId:options;utilityFunctions.checkArgs([fieldId],['fieldId'],'CurrentSubrecord.getValue');value=subrecordObj.getFieldValue(fieldId);field=subrecordObj.recordmanager.getField(fieldId);return!field?undefined:formatter.parse(value,field.type,field.isNumeric,field.isCurrency,field.validationType);};this.setValue=function(options,value)
+{var undef=undefined,fieldId;if(value!==undef)
+{fieldId=options;}
+else if(options!==undef&&options!==null)
+{fieldId=options.fieldId;value=options.value;}
+utilityFunctions.checkArgs([fieldId,value],['fieldId','value'],'CurrentSubrecord.setValue');utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.setValue');};this.getText=function(options)
+{var undef=undefined,fieldId,value,field;fieldId=options!==undef&&options!==null&&options.fieldId!==undef?options.fieldId:options;utilityFunctions.checkArgs([fieldId],['fieldId'],'CurrentSubrecord.getText');value=subrecordObj.getFieldValue(fieldId);field=subrecordObj.recordmanager.getField(fieldId);if(!!field&&field.type==='select')
+{utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.getText');}
+return!field?undefined:formatter.format(value,field.type,field.isNumeric,field.isCurrency,false);};this.setText=function(options,value)
+{var undef=undefined,fieldId;if(value!==undef)
+{fieldId=options;}
+else if(options!==undef&&options!==null)
+{fieldId=options.fieldId;value=options.value;}
+utilityFunctions.checkArgs([fieldId,value],['fieldId','value'],'CurrentSubrecord.setText');utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.setText');};this.getField=function(options)
+{var undef=undefined,fieldId,fldObj;fieldId=options!==undef&&options!==null&&options.fieldId!==undef?options.fieldId:options;utilityFunctions.checkArgs([fieldId],['fieldId'],'CurrentSubrecord.getField');fldObj=subrecordObj.recordmanager.getField(fieldId);return!fldObj?undefined:field.create(fldObj);};this.getSublistField=function(options,fieldId,line)
+{var undef=undefined,sublistId,fldObj;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],'CurrentSubrecord.getSublistField');fldObj=subrecordObj.getChildMachineRecordManager(sublistId).getField(fieldId);return!fldObj?undef:field.create(fldObj);};this.getLineCount=function()
+{var undef=undefined,result,sublistId;sublistId=options!==undef&&options!==null&&options.sublistId!==undef?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],'CurrentSubrecord.getLineCount');try
+{result=subrecordObj.getLineItemCount(sublistId);}
+catch(e)
+{result=-1;}
+return result;};this.insertLine=function(options,line)
+{var undef=undefined,sublistId,ignoreRecalc=false;if(line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;line=options.line;ignoreRecalc=!!options.ignoreRecalc;}
+utilityFunctions.checkArgs([sublistId,line],['sublistId','line'],'CurrentRecord.insertLine');utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.insertLine');};this.removeLine=function(options,line)
+{var undef=undefined,sublistId,ignoreRecalc=false;if(line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;line=options.line;ignoreRecalc=!!options.ignoreRecalc;}
+utilityFunctions.checkArgs([sublistId,line],['sublistId','line'],'CurrentRecord.removeLine');utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.removeLine');};this.findSublistLineWithValue=function(options,fieldId,value)
+{var undef=undefined,result=-1,sublistId,field,i,v;if(fieldId!==undef&&value!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;value=options.value;}
+utilityFunctions.checkArgs([sublistId,fieldId,value],['sublistId','fieldId','value'],'CurrentSubrecord.findSublistLineWithValue');field=subrecordObj.recordmanager.getField(fieldId);sublist=subrecordObj.getChildMachineRecordManager(sublistId);if(!!field&&!!sublist)
+{for(i=0;i<sublist.rows.length;i++)
+{v=formatter.parse(sublist.rows[i][sublist.fldIdx[fieldId]],field.type,field.isNumeric,field.isCurrency,field.validationType);if(v===value)
+{result=i;break;}}}
+return result;};this.cancelLine=function(options)
+{var undef=undefined,sublistId;sublistId=options!==undef&&options!==null&&options.sublistId!==undef?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],'CurrentSubrecord.cancelLine');utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.cancelLine');};this.commitLine=function(options)
+{var undef=undefined,sublistId;sublistId=options!==undef&&options!==null&&options.sublistId!==undef?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],'CurrentSubrecord.commitLine');utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.commitLine');};this.selectLine=function(options,line)
+{var undef=undefined,sublistId;if(line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,line],['sublistId','line'],'CurrentRecord.selectLine');line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.selectLine",subrecordObj.getLineItemCount(sublistId));subrecordObj.selectLineItem(sublistId,line);};this.selectNewLine=function(options)
+{var undef=undefined,sublistId;sublistId=options!==undef&&options!==null&&options.sublistId!==undef?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],'CurrentSubrecord.selectNewLine');utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.selectNewLine');};this.getCurrentSublistValue=function(options,fieldId)
+{var undef=undefined,sublistId,sublist,value,field;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],'CurrentRecord.getCurrentSublistValue');sublist=subrecordObj.getChildMachineRecordManager(sublistId);if(!!sublist)
+{value=sublist.getFieldValue(fieldId);field=sublist.getField(fieldId);}
+return!field?undefined:formatter.parse(value,field.type,field.isNumeric,field.isCurrency,field.validationType);};this.getSublistValue=function(options,fieldId,line)
+{var undef=undefined,sublistId,sublist,value,field;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],'CurrentRecord.getSublistValue');line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.getSublistValue",subrecordObj.getLineItemCount(sublistId));sublist=subrecordObj.getChildMachineRecordManager(sublistId);if(!!sublist)
+{value=sublist.getFieldValue(fieldId,line);field=sublist.getField(fieldId);}
+return!field?undefined:formatter.parse(value,field.type,field.isNumeric,field.isCurrency,field.validationType);};this.setCurrentSublistValue=function(options,fieldId,value)
+{var undef=undefined,sublistId;if(fieldId!==undef&&value!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;value=options.value;}
+utilityFunctions.checkArgs([sublistId,fieldId,value],['sublistId','fieldId','value'],'CurrentSubrecord.setCurrentSublistValue');utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.setCurrentSublistValue');};this.getCurrentSublistText=function(options,fieldId)
+{var undef=undefined,sublistId,sublist,value,field;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],'CurrentRecord.getCurrentSublistText');sublist=subrecordObj.getChildMachineRecordManager(sublistId);if(!!sublist)
+{value=sublist.getFieldValue(fieldId);field=sublist.getField(fieldId);if(!!field&&field.type==='select')
+{utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.getCurrentSublistText');}}
+return!field?undefined:formatter.format(value,field.type,field.isNumeric,field.isCurrency,false);};this.getSublistText=function(options,fieldId,line)
+{var undef=undefined,sublistId,sublist,value,field;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],'CurrentRecord.getSublistText');line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.getSublistText",subrecordObj.getLineItemCount(sublistId));sublist=subrecordObj.getChildMachineRecordManager(sublistId);if(!!sublist)
+{value=sublist.getFieldValue(fieldId,line);field=sublist.getField(fieldId);if(!!field&&field.type==='select')
+{utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.getSublistText');}}
+return!field?undefined:formatter.format(value,field.type,field.isNumeric,field.isCurrency,false);};this.setCurrentSublistText=function(options,fieldId)
+{var undef=undefined,sublistId;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],'CurrentSubrecord.setCurrentSublistText');utilityFunctions.throwSuiteScriptError(error.Type.NOT_SUPPORTED_ON_CURRENT_SUBRECORD,'CurrentSubrecord.setCurrentSublistText');};this.getCurrentSublistIndex=function()
+{var lineNum=subrecordObj.linenum;return recordUtil.getZeroBasedIndex(lineNum);};this.proxy=recordProxy.proxy.bind(null,this,recordOptions);return that;}
+function create(subrecordParent,subrecordObj)
+{if(!subrecordObj)
+return undefined;else
+{var subrecord=new CurrentSubrecord(subrecordParent,subrecordObj);return subrecord;}}
+return Object.freeze({create:create});});define('N/domCurrentRecord',['N/error','N/utilityFunctions','N/record/recordUtilityFunctions','N/restricted/bridge','N/restricted/remoteApiBridge','N/restricted/invoker','N/record/recordProxy','N/record/recordConstants','N/util/formatter','N/util/validator','N/currentRecord/currentField','N/currentRecord/currentSublist','N/currentRecord/currentSubrecord','N/metadata/fieldMetadata','N/metadata/sublistMetadata','N/msgRouter','N/macro','N/fieldTypeConstants'],function(error,utilityFunctions,recordUtil,apiBridge,remoteApi,invoker,recordProxy,constants,formatter,validator,field,sublist,domSubrecord,fieldMetadata,sublistMetadata,msgRouter,macro,fieldTypeConstants)
+{var V1api=null;var currentRecord={};var recordOptions={isClientRecord:true,isSubrecord:false,isDynamic:true,isReadOnly:false,isCurrentRecord:true};var actionCache={};function getV1api()
+{return V1api;}
+function toString()
+{return constants.RECORD_UNDERLYING_IMPL_NAME.DOM_CURRENT_RECORD;}
+currentRecord.toString=toString;var messageService;currentRecord.getMessageService=function getMessageService()
+{if(!messageService)
+messageService=msgRouter.getMessageServiceInstance();return messageService;};currentRecord.getScriptingContext=getScriptingContext;function getScriptingContext(){return typeof _scriptingContext!=='undefined'?_scriptingContext:null;}
+currentRecord.getEventHandlerModules=getEventHandlerModules;function getEventHandlerModules(){var eventHandlerModules=typeof _eventHandlerModules!=='undefined'?_eventHandlerModules:null;return _eventHandlerModules;}
+function getMacroMetadata()
+{return typeof _macro!=='undefined'&&_macro.macroMetadata||[];}
+currentRecord.getMacroMetadata=getMacroMetadata;currentRecord.getMacros=macro.getMacros;currentRecord.getMacro=macro.getMacro;currentRecord.executeMacro=macro.executeMacro;function promiseTo(fn,options,postProcess)
+{var myPromise=new Promise(function(resolve,reject)
+{function callback(result,exception)
+{if(exception)
+{reject(exception);return;}
+resolve(postProcess?postProcess(result,options):result);}
+try
+{fn(options,callback);}
+catch(e)
+{reject(e);}});return myPromise;}
+function doExecuteAction(options,callback)
+{var actionId,params,pkg;if(options!==undefined&&options!==null)
+{actionId=options.id;params=utilityFunctions.isObject(options.params)?options.params:{};pkg=options['package']||null;}
+utilityFunctions.checkArgs([actionId],['id'],'CurrentRecord.executeAction');return invoker(remoteApi,'executeAction',[getRecordType(),pkg,actionId,getId(),params],callback,false);}
+function executeAction(options)
+{return JSON.parse(doExecuteAction(options,null));}
+executeAction.promise=function(options)
+{return promiseTo(doExecuteAction,options,JSON.parse);};currentRecord.executeAction=executeAction;function createAction(options)
+{var TYPE='Action';var pkg=options['package']||null;var actionId=options.id;var Action=function(params)
+{return executeAction(combineOpts(params,actionId,pkg));};Action.execute=function(params)
+{return executeAction(combineOpts(params,actionId,pkg));};Action.promise=function(params)
+{return promiseTo(doExecuteAction,combineOpts(params,actionId,pkg),JSON.parse);};Action.execute.promise=Action.promise;Action.id=actionId;Action.recordType=getRecordType();Action['package']=pkg;Action.label=options.label||null;Action.description=options.description||null;var params={};options.parameters.forEach(function(p){params[p.id]=p;delete p.id;});Action.parameters=params;Action.toJSON=function toJSON(concise)
+{var res={};for(var p in Action)
+{if(Action.hasOwnProperty(p)&&typeof Action[p]!=='function')
+{if(!concise||(Action[p]!=null&&(Action[p].constructor!==Object||Object.keys(Action[p]).length>0)))
+res[p]=Action[p];}}
+return res;};Action.toString=function toString()
+{return TYPE+JSON.stringify(Action.toJSON(true));};return Object.freeze(Action);}
+function combineOpts(params,actionId,pkg)
+{var combinedOpts={};combinedOpts.params=params;combinedOpts.id=actionId;combinedOpts['package']=pkg;return combinedOpts;}
+function processGetActionsResult(jsonRes,options)
+{var metadata=JSON.parse(jsonRes);actionCache[getRecordType().toLowerCase()]=jsonRes;var Actions={};for(var i=0;i<metadata.length;i++)
+{var action=createAction(metadata[i]);var fullId=action['package']?action['package']+'.'+action.id:action.id;Actions[fullId]=action;}
+return Object.freeze(Actions);}
+function doGetActions(options,callback)
+{var recordType=getRecordType().toLowerCase();if(!actionCache[recordType])
+return invoker(remoteApi,'getRecordActions',[recordType,null,null],callback,false);if(callback)
+callback(actionCache[recordType]);else
+return actionCache[recordType];}
+function getActions(options)
+{return processGetActionsResult(doGetActions(options,null),options);}
+getActions.promise=function(options)
+{return promiseTo(doGetActions,options,processGetActionsResult);};currentRecord.getActions=getActions;function processGetActionResult(jsonRes,options)
+{var metadata=JSON.parse(jsonRes);actionCache[getRecordType().toLowerCase()]=jsonRes;var result=null;var pkg=options['package']||'';for(var i=0;i<metadata.length;i++)
+{var curPkg=metadata[i]['package']||'';if(curPkg===pkg&&options.id===metadata[i].id)
+{result=createAction(metadata[i]);break;}}
+if(result===null)
+utilityFunctions.throwSuiteScriptError(error.Type.SSS_INVALID_ACTION_ID);return result;}
+function doGetAction(options,callback)
+{var actionId=options?options.id:null;utilityFunctions.checkArgs([actionId],['id'],'CurrentRecord.getAction');return doGetActions(options,callback);}
+function getAction(options)
+{return processGetActionResult(doGetAction(options,null),options);}
+getAction.promise=function(options)
+{return promiseTo(doGetAction,options,processGetActionResult);};currentRecord.getAction=getAction;function validateAndFormat(id,type,value)
+{validator.validateField(id,type,value);if(!fieldTypeConstants.isNumeric(type)&&!fieldTypeConstants.isCurrency(type))
+value=formatter.format(value,type);return value;}
+function checkAndFormatForSetText(text,fldObj,fieldId)
+{var value=formatter.parse(text,fldObj.type);return validateAndFormat(fieldId,fldObj.type,value);}
+function setValue(options,value)
+{var fieldId,fireFieldChanged=true,fireSlavingSync=false,undef=undefined;if(value!==undef)
+{fieldId=options;}
+else if(options!==undef&&options!==null)
+{fieldId=options.fieldId;value=options.value;fireFieldChanged=util.isBoolean(options.ignoreFieldChange)?!options.ignoreFieldChange:fireFieldChanged;fireSlavingSync=util.isBoolean(options.fireSlavingSync)?options.fireSlavingSync:fireSlavingSync;}
+utilityFunctions.checkArgs([fieldId],['fieldId'],"CurrentRecord.setValue");doSetValue(fieldId,value,fireFieldChanged,fireSlavingSync);return currentRecord;}
+currentRecord.setValue=setValue;function doSetValue(fieldId,value,fireFieldChanged,fireSlavingSync)
+{var fieldObj=getV1api().nlapiGetField(fieldId);if(fieldObj!==null)
+{value=validateAndFormat(fieldId,fieldObj.type,value);getV1api().nlapiSetFieldValue.v2(fieldId,value,fireFieldChanged,fireSlavingSync);}}
+function getValue(options)
+{var fieldId;fieldId=((options!==undefined)&&(options!==null)&&!util.isString(options))?options.fieldId:options;utilityFunctions.checkArgs([fieldId],['fieldId'],"CurrentRecord.getValue");getV1api().nsapiAssertTrue(!isSubrecordField(null,fieldId),'SSS_INVALID_OPERATION_USING_SUBRECORD_FIELD');return doGetValue(fieldId);}
+currentRecord.getValue=getValue;function doGetValue(fieldId)
+{var fieldObj=getV1api().nlapiGetField(fieldId);var value;if(fieldObj==null)
+return undefined;if(fieldObj.type==="multiselect")
+{if(fieldObj.isHidden)
+value=getV1api().nlapiGetFieldValue(fieldId).split(String.fromCharCode(5));else
+value=getV1api().nlapiGetFieldValues(fieldId);}
+else
+{value=(fieldObj!==null)?formatter.parse(getV1api().nlapiGetFieldValue(fieldId),fieldObj.type):undefined;}
+return value==null?undefined:value;}
+function setMatrixHeaderValue(options,fieldId,column,value)
+{var sublistId,fireFieldChanged=true,fireSlavingSync=false,undef=undefined;if(fieldId!==undef&&column!==undef&&value!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;column=options.column;value=options.value;fireFieldChanged=util.isBoolean(options.ignoreFieldChange)?!options.ignoreFieldChange:fireFieldChanged;fireSlavingSync=util.isBoolean(options.fireSlavingSync)?options.fireSlavingSync:fireSlavingSync;}
+utilityFunctions.checkArgs([sublistId,fieldId,column],['sublistId','fieldId','column'],'CurrentRecord.setMatrixHeaderValue');doSetMatrixHeaderValue(sublistId,fieldId,column,value,fireFieldChanged,fireSlavingSync);return currentRecord;}
+currentRecord.setMatrixHeaderValue=setMatrixHeaderValue;function doSetMatrixHeaderValue(sublistId,fieldId,column,value,fireFieldChanged,fireSlavingSync)
+{column=recordUtil.validateAndGetOneBasedIndex(column,"CurrentRecord.setMatrixHeaderValue");var fieldObj=getV1api().nlapiGetMatrixField(sublistId,fieldId,column);if(fieldObj!==null)
+{value=validateAndFormat(fieldId,fieldObj.type,value);getV1api().nlapiSetMatrixValue.v2(sublistId,fieldId,column,value,fireFieldChanged,fireSlavingSync);}}
+function getMatrixHeaderValue(options,fieldId,column)
+{var sublistId,undef=undefined;if(fieldId!==undef&&column!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;column=options.column;}
+utilityFunctions.checkArgs([sublistId,fieldId,column],['sublistId','fieldId','column'],'CurrentRecord.getMatrixHeaderValue');return doGetMatrixHeaderValue(sublistId,fieldId,column)}
+currentRecord.getMatrixHeaderValue=getMatrixHeaderValue;function doGetMatrixHeaderValue(sublistId,fieldId,column)
+{column=recordUtil.validateAndGetOneBasedIndex(column,"CurrentRecord.getMatrixHeaderValue");var fieldObj=getV1api().nlapiGetMatrixField(sublistId,fieldId,column);var value;if(fieldObj==null)
+return undefined;value=formatter.parse(getV1api().nlapiGetMatrixValue(sublistId,fieldId,column),fieldObj.type);return value==null?undefined:value;}
+function setText(options,text)
+{var fieldId,fireFieldChanged=true,fireSlavingSync=false,undef=undefined;if(text!==undef)
+{fieldId=options;}
+else if(options!==undef&&options!==null)
+{fieldId=options.fieldId;text=options.text;fireFieldChanged=util.isBoolean(options.ignoreFieldChange)?!options.ignoreFieldChange:fireFieldChanged;fireSlavingSync=util.isBoolean(options.fireSlavingSync)?options.fireSlavingSync:fireSlavingSync;}
+utilityFunctions.checkArgs([fieldId],['fieldId'],"CurrentRecord.setText");doSetText(fieldId,text,fireFieldChanged,fireSlavingSync);return currentRecord;}
+currentRecord.setText=setText;function doSetText(fieldId,text,fireFieldChanged,fireSlavingSync)
+{var fldObj=getV1api().nlapiGetField(fieldId);if(fldObj==null)
+return;if(fldObj.type==="multiselect")
+{text=(!Array.isArray(text))?text.split(String.fromCharCode(5)):text;getV1api().nlapiSetFieldTexts.v2(fieldId,text,fireFieldChanged,fireSlavingSync);}
+else if(fldObj.type.indexOf("select")!==-1)
+{getV1api().nlapiSetFieldText.v2(fieldId,text,fireFieldChanged,fireSlavingSync);}
+else
+{var value=checkAndFormatForSetText(text,fldObj,fieldId);getV1api().nlapiSetFieldValue.v2(fieldId,value,fireFieldChanged,fireSlavingSync);}}
+function getText(options)
+{var fieldId;fieldId=((options!==undefined)&&(options!==null)&&!util.isString(options))?options.fieldId:options;utilityFunctions.checkArgs([fieldId],['fieldId'],"CurrentRecord.getText");return doGetText(fieldId);}
+currentRecord.getText=getText;function doGetText(fieldId)
+{var fieldObj=getV1api().nlapiGetField(fieldId);if(fieldObj==null)
+return undefined;var text;if(fieldObj.type==="multiselect")
+{text=getV1api().nlapiGetFieldTexts(fieldId);}
+else if(fieldObj.type.indexOf("select")!==-1)
+{text=getV1api().nlapiGetFieldText(fieldId);}
+else
+{text=formatter.format(getV1api().nlapiGetFieldValue(fieldId),fieldObj.type);}
+return text==null?undefined:text;}
+function getSublistValue(options,fieldId,line)
+{var sublistId,undef=undefined;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],"CurrentRecord.getSublistValue");return doGetSublistValue(sublistId,fieldId,line)}
+currentRecord.getSublistValue=getSublistValue;function doGetSublistValue(sublistId,fieldId,line)
+{line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.getSublistValue",getV1api().nlapiGetLineItemCount(sublistId));var fieldType=getEncodedFieldType(sublistId,fieldId,true);var value=fieldType?formatter.parse(getV1api().nlapiGetLineItemValue(sublistId,fieldId,line),fieldType):null;return value==null?undefined:value;}
+function getSublistText(options,fieldId,line)
+{var sublistId,undef=undefined;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],"CurrentRecord.getSublistText");return doGetSublistText(sublistId,fieldId,line)}
+currentRecord.getSublistText=getSublistText;function doGetSublistText(sublistId,fieldId,line)
+{line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.getSublistText",getV1api().nlapiGetLineItemCount(sublistId));var fieldType=getEncodedFieldType(sublistId,fieldId,true);if(fieldType===null)
+return undefined;var text;if(fieldType==="multiselect")
+text=getV1api().nlapiGetLineItemTexts(sublistId,fieldId,line);else if(fieldType.indexOf("select")!==-1)
+text=getV1api().nlapiGetLineItemText(sublistId,fieldId,line);else
+text=formatter.format(getV1api().nlapiGetLineItemValue(sublistId,fieldId,line),fieldType);return text==null?undefined:text;}
+function setMatrixSublistValue(options,fieldId,line,column,value)
+{var sublistId,undef=undefined;if(fieldId!==undef&&line!==undef&&column!==undef&&value!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;column=options.column;value=options.value;}
+utilityFunctions.checkArgs([sublistId,fieldId,line,column],['sublistId','fieldId','line','column'],'CurrentRecord.setMatrixSublistValue');doSetMatrixSublistValue(sublistId,fieldId,line,column,value)}
+currentRecord.setMatrixSublistValue=setMatrixSublistValue;function doSetMatrixSublistValue(sublistId,fieldId,line,column,value)
+{line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.setMatrixSublistValue",getV1api().nlapiGetLineItemCount(sublistId));column=recordUtil.validateAndGetOneBasedIndex(column,"CurrentRecord.setMatrixSublistValue");var fieldObj=getV1api().nlapiGetLineItemMatrixField(sublistId,fieldId,column,line);if(fieldObj!==null)
+{validator.validateField(fieldId,fieldObj.type,value);getV1api().nlapiSetLineItemMatrixValue(sublistId,fieldId,line,column,value);}}
+function getMatrixSublistValue(options,fieldId,line,column)
+{var sublistId,undef=undefined;if(fieldId!==undef&&line!==undef&&column!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;column=options.column;}
+utilityFunctions.checkArgs([sublistId,fieldId,line,column],['sublistId','fieldId','line','column'],'CurrentRecord.getMatrixSublistValue');return doGetMatrixSublistValue(sublistId,fieldId,line,column);}
+currentRecord.getMatrixSublistValue=getMatrixSublistValue;function doGetMatrixSublistValue(sublistId,fieldId,line,column)
+{line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.getMatrixSublistValue",getV1api().nlapiGetLineItemCount(sublistId));column=recordUtil.validateAndGetOneBasedIndex(column,"CurrentRecord.getMatrixSublistValue");var fieldObj=getV1api().nlapiGetLineItemMatrixField(sublistId,fieldId,column,line);if(fieldObj==null)
+return undefined;var value=formatter.parse(getV1api().nlapiGetLineItemMatrixValue(sublistId,fieldId,line,column),fieldObj.type);return value==null?undefined:value;}
+function setCurrentSublistValue(options,fieldId,value)
+{var sublistId,fireFieldChanged=true,fireSlavingSync=false,undef=undefined;if(fieldId!==undef&&value!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;value=options.value;fireFieldChanged=util.isBoolean(options.ignoreFieldChange)?!options.ignoreFieldChange:fireFieldChanged;fireSlavingSync=util.isBoolean(options.fireSlavingSync)?options.fireSlavingSync:fireSlavingSync;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],"CurrentRecord.setCurrentSublistValue");doSetCurrentSublistValue(sublistId,fieldId,value,fireFieldChanged,fireSlavingSync);return currentRecord;}
+currentRecord.setCurrentSublistValue=setCurrentSublistValue;function doSetCurrentSublistValue(sublistId,fieldId,value,fireFieldChanged,fireSlavingSync)
+{var fieldObj=getV1api().nlapiGetLineItemField(sublistId,fieldId,isEditMachine(sublistId)?null:getV1api().nlapiGetCurrentLineItemIndex(sublistId));if(fieldObj==null)
+return undefined;if(Array.isArray(value))
+{value=value.join(String.fromCharCode(5));}
+else if(fieldObj.type.indexOf("select")===-1)
+{value=validateAndFormat(fieldId,fieldObj.type,value);}
+getV1api().nlapiSetCurrentLineItemValue.v2(sublistId,fieldId,value,fireFieldChanged,fireSlavingSync);}
+function getCurrentSublistValue(options,fieldId)
+{var sublistId,undef=undefined;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],"CurrentRecord.getCurrentSublistValue");return doGetCurrentSublistValue(sublistId,fieldId);}
+currentRecord.getCurrentSublistValue=getCurrentSublistValue;function doGetCurrentSublistValue(sublistId,fieldId)
+{var fieldObj=getV1api().nlapiGetLineItemField(sublistId,fieldId,isEditMachine(sublistId)?null:getV1api().nlapiGetCurrentLineItemIndex(sublistId));var value=(fieldObj!==null)?formatter.parse(getV1api().nlapiGetCurrentLineItemValue(sublistId,fieldId),fieldObj.type):null;return value==null?undefined:value;}
+function setCurrentMatrixSublistValue(options,fieldId,column,value)
+{var sublistId,fireFieldChanged=true,fireSlavingSync=false,undef=undefined;if(fieldId!==undef&&column!==undef&&value!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;column=options.column;value=options.value;fireFieldChanged=util.isBoolean(options.ignoreFieldChange)?!options.ignoreFieldChange:fireFieldChanged;fireSlavingSync=util.isBoolean(options.fireSlavingSync)?options.fireSlavingSync:fireSlavingSync;}
+utilityFunctions.checkArgs([sublistId,fieldId,column],['sublistId','fieldId','column'],'CurrentRecord.setCurrentMatrixSublistValue');doSetCurrentMatrixSublistValue(sublistId,fieldId,column,value,fireFieldChanged,fireSlavingSync)}
+currentRecord.setCurrentMatrixSublistValue=setCurrentMatrixSublistValue;function doSetCurrentMatrixSublistValue(sublistId,fieldId,column,value,fireFieldChanged,fireSlavingSync)
+{column=recordUtil.validateAndGetOneBasedIndex(column,"CurrentRecord.setCurrentMatrixSublistValue");var fieldObj=getV1api().nlapiGetLineItemMatrixField(sublistId,fieldId,column,getV1api().nlapiGetCurrentLineItemIndex(sublistId));if(fieldObj!==null)
+{validator.validateField(fieldId,fieldObj.type,value);getV1api().nlapiSetCurrentLineItemMatrixValue(sublistId,fieldId,column,value,fireFieldChanged,fireSlavingSync);}}
+function getCurrentMatrixSublistValue(options,fieldId,column)
+{var sublistId,undef=undefined;if(fieldId!==undef&&column!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;column=options.column;}
+utilityFunctions.checkArgs([sublistId,fieldId,column],['sublistId','fieldId','column'],'CurrentRecord.getCurrentMatrixSublistValue');var currLine=getV1api().nlapiGetCurrentLineItemIndex(sublistId);if(currLine>0)
+currLine=currLine-1;return doGetMatrixSublistValue(sublistId,fieldId,currLine,column);}
+currentRecord.getCurrentMatrixSublistValue=getCurrentMatrixSublistValue;function setCurrentSublistText(options,fieldId,text)
+{var sublistId,fireFieldChanged=true,fireSlavingSync=false,undef=undefined;if(fieldId!==undef&&text!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;text=options.text;fireFieldChanged=util.isBoolean(options.ignoreFieldChange)?!options.ignoreFieldChange:fireFieldChanged;fireSlavingSync=util.isBoolean(options.fireSlavingSync)?options.fireSlavingSync:fireSlavingSync;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],'CurrentRecord.setCurrentSublistText');doSetCurrentSublistText(sublistId,fieldId,text,fireFieldChanged,fireSlavingSync);return currentRecord;}
+currentRecord.setCurrentSublistText=setCurrentSublistText;function doSetCurrentSublistText(sublistId,fieldId,text,fireFieldChanged,fireSlavingSync)
+{var fieldObj=getV1api().nlapiGetLineItemField(sublistId,fieldId,isEditMachine(sublistId)?null:getV1api().nlapiGetCurrentLineItemIndex(sublistId));if(fieldObj===null)
+return;if(fieldObj.type.indexOf("select")!==-1)
+{getV1api().nlapiSetCurrentLineItemText.v2(sublistId,fieldId,text,fireFieldChanged,fireSlavingSync);}
+else
+{var value=checkAndFormatForSetText(text,fieldObj,fieldId);getV1api().nlapiSetCurrentLineItemValue.v2(sublistId,fieldId,value,fireFieldChanged,fireSlavingSync);}}
+function getCurrentSublistText(options,fieldId)
+{var sublistId,undef=undefined;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],'CurrentRecord.getCurrentSublistText');return doGetCurrentSublistText(sublistId,fieldId);}
+currentRecord.getCurrentSublistText=getCurrentSublistText;function doGetCurrentSublistText(sublistId,fieldId)
+{var fldObj=getV1api().nlapiGetLineItemField(sublistId,fieldId,isEditMachine(sublistId)?null:getV1api().nlapiGetCurrentLineItemIndex(sublistId));if(fldObj===null)
+return undefined;var text;if(fldObj.type.indexOf("select")!==-1)
+{text=getV1api().nlapiGetCurrentLineItemText(sublistId,fieldId);}
+else
+{text=getV1api().nlapiGetCurrentLineItemValue(sublistId,fieldId);}
+return text==null?undefined:text;}
+function fixMissingProperties(obj)
+{if(obj!==null)
+{obj.visible=true;obj.display=true;}
+return obj;}
+function getField(options)
+{var fieldId=((options!==undefined)&&(options!==null)&&!util.isString(options))?options.fieldId:options;utilityFunctions.checkArgs([fieldId],['fieldId'],"CurrentRecord.getField");var fldObj=getV1api().nlapiGetField(fieldId);var fieldElement=document.getElementById(fieldId+"_fs");if(fldObj!==null&&fieldElement!==null&&fieldElement.style!==null)
+{fldObj.visible=fieldElement.style.visibility!=="hidden";fldObj.display=fieldElement.style.display!=="none";}
+return fldObj!=null?fieldMetadata.wrap({delegate:field.create(fldObj),category:fieldMetadata.Category.CURRENT_BODY}):null;}
+currentRecord.getField=getField;function getSublist(options)
+{var sublistId=((options!==undefined)&&(options!==null)&&!util.isString(options))?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],"CurrentRecord.getSublist");var sublistObj=getV1api().nlapiGetSubList(sublistId);return sublistObj!=null?sublistMetadata.wrap({delegate:sublist.create(sublistObj),category:sublistMetadata.Category.CURRENT}):null;}
+currentRecord.getSublist=getSublist;function getMatrixHeaderField(options,fieldId,column)
+{var sublistId,undef=undefined;if(fieldId!==undef&&column!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;column=options.column;}
+utilityFunctions.checkArgs([sublistId,fieldId,column],['sublistId','fieldId','column'],'CurrentRecord.getMatrixHeaderField');column=recordUtil.validateAndGetOneBasedIndex(column,"CurrentRecord.getMatrixHeaderField");var fldObj=getV1api().nlapiGetMatrixField(sublistId,fieldId,column);fldObj=fixMissingProperties(fldObj);return fldObj!=null?fieldMetadata.wrap({delegate:field.create(fldObj),category:fieldMetadata.Category.CURRENT_BODY}):null;}
+currentRecord.getMatrixHeaderField=getMatrixHeaderField;function getSublistField(options,fieldId,line)
+{var sublistId,undef=undefined;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],'CurrentRecord.getSublistField');line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.getSublistField",getV1api().nlapiGetLineItemCount(sublistId));var fldObj=getV1api().nlapiGetLineItemField(sublistId,fieldId,line);fldObj=fixMissingProperties(fldObj);return fldObj!=null?fieldMetadata.wrap({delegate:field.create(fldObj),category:fieldMetadata.Category.CURRENT_SUBLIST}):null;}
+currentRecord.getSublistField=getSublistField;function getMatrixSublistField(options,fieldId,column,line)
+{var sublistId,undef=undefined;if(fieldId!==undef&&column!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;column=options.column;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,column,line],['sublistId','fieldId','column','line'],'CurrentRecord.getMatrixSublistField');column=recordUtil.validateAndGetOneBasedIndex(column,"CurrentRecord.getMatrixSublistField");line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.getMatrixSublistField",getV1api().nlapiGetLineItemCount(sublistId));var fldObj=getV1api().nlapiGetLineItemMatrixField(sublistId,fieldId,column,line);fldObj=fixMissingProperties(fldObj);return fldObj!=null?fieldMetadata.wrap({delegate:field.create(fldObj),category:fieldMetadata.Category.CURRENT_SUBLIST}):null;}
+currentRecord.getMatrixSublistField=getMatrixSublistField;function getCurrentSublistIndex(options)
+{var sublistId=((options!==undefined)&&(options!==null)&&!util.isString(options))?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],"CurrentRecord.getCurrentSublistIndex");var currIndex=getV1api().nlapiGetCurrentLineItemIndex(sublistId);return recordUtil.getZeroBasedIndex(currIndex);}
+currentRecord.getCurrentSublistIndex=getCurrentSublistIndex;function findSublistLineWithValue(options,fieldId,value)
+{var sublistId,undef=undefined;if(fieldId!==undef&&value!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;value=options.value;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],'CurrentRecord.findSublistLineWithValue');return recordUtil.getZeroBasedIndex(getV1api().nlapiFindLineItemValue(sublistId,fieldId,value));}
+currentRecord.findSublistLineWithValue=findSublistLineWithValue;function findMatrixSublistLineWithValue(options,fieldId,value,column)
+{var sublistId,undef=undefined;if(fieldId!==undef&&value!==undef&&column!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;value=options.value;column=options.column;}
+column=recordUtil.validateAndGetOneBasedIndex(column,"CurrentRecord.findMatrixSublistLineWithValue");utilityFunctions.checkArgs([sublistId,fieldId,column],['sublistId','fieldId','column'],'CurrentRecord.findMatrixSublistLineWithValue');return recordUtil.getZeroBasedIndex(getV1api().nlapiFindLineItemMatrixValue(sublistId,fieldId,value,column));}
+currentRecord.findMatrixSublistLineWithValue=findMatrixSublistLineWithValue;function selectLine(options,line)
+{var sublistId,undef=undefined;if(line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,line],['sublistId','line'],"CurrentRecord.selectLine");if(recordUtil.getZeroBasedIndex(getV1api().nlapiGetCurrentLineItemIndex(sublistId))!==line)
+{line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.selectLine",getV1api().nlapiGetLineItemCount(sublistId));getV1api().nlapiSelectLineItem(sublistId,line);}
+return currentRecord;}
+currentRecord.selectLine=selectLine;function commitLine(options)
+{var sublistId=((options!==undefined)&&(options!==null)&&!util.isString(options))?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],"CurrentRecord.commitLine");getV1api().nlapiCommitLineItem(sublistId);return currentRecord;}
+currentRecord.commitLine=commitLine;function insertLine(options,line)
+{var sublistId,undef=undefined;if(line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,line],['sublistId','line'],"CurrentRecord.insertLine");line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.insertLine",getV1api().nlapiGetLineItemCount(sublistId)+1);getV1api().nlapiInsertLineItem(sublistId,line);return currentRecord;}
+currentRecord.insertLine=insertLine;function removeLine(options,line)
+{var sublistId,undef=undefined;if(line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,line],['sublistId','line'],"CurrentRecord.removeLine");line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.removeLine",getV1api().nlapiGetLineItemCount(sublistId));getV1api().nlapiRemoveLineItem(sublistId,line);return currentRecord;}
+currentRecord.removeLine=removeLine;function cancelLine(options)
+{var sublistId=((options!==undefined)&&(options!==null)&&!util.isString(options))?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],"CurrentRecord.cancelLine");getV1api().nlapiCancelLineItem(sublistId);return currentRecord;}
+currentRecord.cancelLine=cancelLine;function selectNewLine(options)
+{var sublistId=((options!==undefined)&&(options!==null)&&!util.isString(options))?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],"CurrentRecord.selectNewLine");getV1api().nlapiSelectNewLineItem(sublistId);return currentRecord;}
+currentRecord.selectNewLine=selectNewLine;function getLineCount(options)
+{var sublistId=((options!==undefined)&&(options!==null)&&!util.isString(options))?options.sublistId:options;utilityFunctions.checkArgs([sublistId],['sublistId'],"CurrentRecord.getLineCount");return getV1api().nlapiGetLineItemCount(sublistId);}
+currentRecord.getLineCount=getLineCount;function getMatrixHeaderCount(options,fieldId)
+{var sublistId,undef=undefined;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],'CurrentRecord.getMatrixHeaderCount');return getV1api().nlapiGetMatrixCount(sublistId,fieldId);}
+currentRecord.getMatrixHeaderCount=getMatrixHeaderCount;function getRecordType()
+{return getV1api().nlapiGetRecordType();}
+utilityFunctions.addReadOnlyProperty(currentRecord,'type',getRecordType);function getId()
+{return getV1api().nlapiGetRecordId();}
+utilityFunctions.addReadOnlyProperty(currentRecord,'id',getId);function getIsDynamic(){return!recordOptions.isReadOnly;}
+utilityFunctions.addReadOnlyProperty(currentRecord,'isDynamic',getIsDynamic);function getIsCurrentRecord(){return recordOptions.isCurrentRecord;}
+function hasSubrecord(options)
+{var undef=undefined,result,fieldId;fieldId=options!==undef&&options!==null&&!util.isString(options)?options.fieldId:options;utilityFunctions.checkArgs([fieldId],['fieldId'],'CurrentRecord.hasSubrecord');return getV1api().nlapiViewSubrecord(fieldId)!==null;}
+currentRecord.hasSubrecord=hasSubrecord;function oldGetSubrecord(options)
+{var undef=undefined,fieldId,subrecordObj;fieldId=options!==undef&&options!==null&&!util.isString(options)?options.fieldId:options;utilityFunctions.checkArgs([fieldId],['fieldId'],'CurrentRecord.getSubrecord');subrecordObj=getV1api().nlapiViewSubrecord(fieldId);return subrecordObj===null?null:domSubrecord.create(currentRecord,subrecordObj);}
+currentRecord.getSubrecord=oldGetSubrecord;function oldRemoveSubrecord(options)
+{var undef=undefined,fieldId;fieldId=options!==undef&&options!==null&&!util.isString(options)?options.fieldId:options;utilityFunctions.checkArgs([fieldId],['fieldId'],'CurrentRecord.removeSubrecord');getV1api().nlapiRemoveSubrecord(fieldId);return currentRecord;}
+currentRecord.removeSubrecord=oldRemoveSubrecord;function hasSublistSubrecord(options,fieldId,line)
+{var undef=undefined,result,sublistId;if(fieldId!==undef&&line!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;line=options.line;}
+utilityFunctions.checkArgs([sublistId,fieldId,line],['sublistId','fieldId','line'],'CurrentRecord.hasSublistSubrecord');line=recordUtil.validateAndGetOneBasedIndex(line,"CurrentRecord.hasSublistSubrecord",getV1api().nlapiGetLineItemCount(sublistId));result=getV1api().nlapiViewLineItemSubrecord(sublistId,fieldId,line)!==null;return result;}
+currentRecord.hasSublistSubrecord=hasSublistSubrecord;function hasCurrentSublistSubrecord(options,fieldId)
+{var undef=undefined,result,sublistId;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],'CurrentRecord.hasCurrentSublistSubrecord');result=getV1api().nlapiViewCurrentLineItemSubrecord(sublistId,fieldId)!==null;return result;}
+currentRecord.hasCurrentSublistSubrecord=hasCurrentSublistSubrecord;function oldGetCurrentSublistSubrecord(options,fieldId)
+{var undef=undefined,sublistId,subrecordObj;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],'CurrentRecord.getCurrentSublistSubrecord');subrecordObj=getV1api().nlapiViewCurrentLineItemSubrecord(sublistId,fieldId);if(!!subrecordObj)
+{subrecordObj=domSubrecord.create(currentRecord,subrecordObj);}
+return subrecordObj;}
+currentRecord.getCurrentSublistSubrecord=oldGetCurrentSublistSubrecord;function oldRemoveCurrentSublistSubrecord(options,fieldId)
+{var undef=undefined,sublistId;if(fieldId!==undef)
+{sublistId=options;}
+else if(options!==undef&&options!==null)
+{sublistId=options.sublistId;fieldId=options.fieldId;}
+utilityFunctions.checkArgs([sublistId,fieldId],['sublistId','fieldId'],'CurrentRecord.removeCurrentSublistSubrecord');getV1api().nlapiRemoveCurrentLineItemSubrecord(sublistId,fieldId);return currentRecord;}
+currentRecord.removeCurrentSublistSubrecord=oldRemoveCurrentSublistSubrecord;currentRecord.proxy=recordProxy.proxy.bind(null,currentRecord,recordOptions);function getSingletonDomCurrentRecordImpl(V1apiGetterCallback,isReadOnly)
+{if(!V1api)
+V1api=V1apiGetterCallback();recordOptions.isReadOnly=isReadOnly;var wrappedRecord=currentRecord.proxy({isInteractive:false});return wrappedRecord;}
+return{getSingletonDomCurrentRecordImpl:getSingletonDomCurrentRecordImpl}});define('N/currentRecord',['N/nsobject','N/currentRecordBootstrap','N/domCurrentRecord'],function(nsobject,currentRecordBootstrap,domCurrentRecord)
+{var undef=undefined;function createCurrentRecordByWrappingNewDynamicRecordOrDomRecord()
+{var dynamicRecord=currentRecordBootstrap.getCurrentRecord();if(!!dynamicRecord)
+return dynamicRecord;if(pageHasV1Api())
+{var isReadOnly=isPageViewMode();var domRecord=domCurrentRecord.getSingletonDomCurrentRecordImpl(V1apiGetterFunc,isReadOnly);if(!!domRecord)
+return domRecord;}
+return undef;}
+function isPageViewMode()
+{return!(document&&document.forms['main_form']&&document.forms['main_form'].onsubmit);}
+function pageHasV1Api()
+{try
+{return!!nlapiGetField;}
+catch(e)
+{return false;}}
+function V1apiGetterFunc()
+{var V1api={nlapiCancelLineItem:nlapiCancelLineItem,nlapiCommitLineItem:nlapiCommitLineItem,nlapiFindLineItemMatrixValue:nlapiFindLineItemMatrixValue,nlapiFindLineItemValue:nlapiFindLineItemValue,nlapiGetCurrentLineItemIndex:nlapiGetCurrentLineItemIndex,nlapiGetCurrentLineItemText:nlapiGetCurrentLineItemText,nlapiGetCurrentLineItemValue:nlapiGetCurrentLineItemValue,nlapiGetField:nlapiGetField,nlapiGetFieldText:nlapiGetFieldText,nlapiGetFieldTexts:nlapiGetFieldTexts,nlapiGetFieldValue:nlapiGetFieldValue,nlapiGetFieldValues:nlapiGetFieldValues,nlapiGetLineItemCount:nlapiGetLineItemCount,nlapiGetLineItemField:nlapiGetLineItemField,nlapiGetLineItemMatrixField:nlapiGetLineItemMatrixField,nlapiGetLineItemMatrixValue:nlapiGetLineItemMatrixValue,nlapiGetLineItemText:nlapiGetLineItemText,nlapiGetLineItemTexts:nlapiGetLineItemTexts,nlapiGetLineItemValue:nlapiGetLineItemValue,nlapiGetMatrixCount:nlapiGetMatrixCount,nlapiGetMatrixField:nlapiGetMatrixField,nlapiGetMatrixValue:nlapiGetMatrixValue,nlapiGetRecordId:nlapiGetRecordId,nlapiGetRecordType:nlapiGetRecordType,nlapiGetSubList:nlapiGetSubList,nlapiInsertLineItem:nlapiInsertLineItem,nlapiRemoveCurrentLineItemSubrecord:nlapiRemoveCurrentLineItemSubrecord,nlapiRemoveLineItem:nlapiRemoveLineItem,nlapiRemoveSubrecord:nlapiRemoveSubrecord,nlapiSelectLineItem:nlapiSelectLineItem,nlapiSelectNewLineItem:nlapiSelectNewLineItem,nlapiSetCurrentLineItemMatrixValue:nlapiSetCurrentLineItemMatrixValue,nlapiSetCurrentLineItemText:nlapiSetCurrentLineItemText,nlapiSetCurrentLineItemValue:nlapiSetCurrentLineItemValue,nlapiSetFieldText:nlapiSetFieldText,nlapiSetFieldTexts:nlapiSetFieldTexts,nlapiSetFieldValue:nlapiSetFieldValue,nlapiSetLineItemMatrixValue:nlapiSetLineItemMatrixValue,nlapiSetMatrixValue:nlapiSetMatrixValue,nlapiViewCurrentLineItemSubrecord:nlapiViewCurrentLineItemSubrecord,nlapiViewLineItemSubrecord:nlapiViewLineItemSubrecord,nlapiViewSubrecord:nlapiViewSubrecord,nsapiIsInternal:nsapiIsInternal,nsapiSetIsInternal:nsapiSetIsInternal,nsapiAssertTrue:nsapiAssertTrue};return V1api;}
+var currentRecordModule={get:function()
+{var currentRecord=createCurrentRecordByWrappingNewDynamicRecordOrDomRecord();return currentRecord;}};currentRecordModule.get.promise=function()
+{return new Promise(function(resolve,reject)
+{var currentRecord=createCurrentRecordByWrappingNewDynamicRecordOrDomRecord();if(currentRecord!=null)
+{resolve(currentRecord);}});};return Object.freeze(currentRecordModule);});define('N',['N/nsobject','N/error','N/util','N/log','N/xml','N/format','N/currency','N/runtime','N/action','N/query','N/http','N/portlet','N/https','N/search','N/transaction','N/email','N/ui','N/url','N/record','N/currentRecord'],function(nsobject,error,util,log,xml,format,currency,runtime,action,query,http,portlet,https,search,transaction,email,ui,url,record,currentRecord){function ModuleConfiguration(){this.create=function(module){return{value:module,enumerable:true,configurable:false,writable:false};};}
+var moduleConfiguration=new ModuleConfiguration();return Object.create(nsobject.getNewInstance(),{error:moduleConfiguration.create(error),util:moduleConfiguration.create(util),log:moduleConfiguration.create(log),xml:moduleConfiguration.create(xml),format:moduleConfiguration.create(format),currency:moduleConfiguration.create(currency),runtime:moduleConfiguration.create(runtime),action:moduleConfiguration.create(action),query:moduleConfiguration.create(query),http:moduleConfiguration.create(http),portlet:moduleConfiguration.create(portlet),https:moduleConfiguration.create(https),search:moduleConfiguration.create(search),transaction:moduleConfiguration.create(transaction),email:moduleConfiguration.create(email),ui:moduleConfiguration.create(ui),url:moduleConfiguration.create(url),record:moduleConfiguration.create(record),currentRecord:moduleConfiguration.create(currentRecord)});},{internal:['FieldValidationHelper','environment','nsobject','utilityFunctions','fieldUtil','util/currencyUtility','util/date','util/recordScripting','util/slaving','util/sqlInjectionFilter','util/formatter','fieldTypeConstants','util/validator','util/uuid','field','msgRouter','creationFunctionWrapper','dateTimeZone','metadata/fieldMetadata','metadata/fieldDefinition','metadata/fieldPermissions','metadata/sublistMetadata','metadata/sublistDefinition','metadata/sublistPermissions','http/httpUtil','record/recordImpl','record/recordUtil','search/searchUtil','search/searchObject','search/pagingUtil','suiteletContext','transaction/transactionUtil','common/pattern/iterator','common/record/recordActualWork','common/record/recordDefinition','common/record/recordDefinitionEvent','common/record/recordDefinitionEventCompressor','common/record/line/lineDefinition','emptyModule','pagination/paginationObject','util/serverWidgetUtility','searchDefinition','scope','eventEmitter','macro','queryInternal','notification','saveResult','exampleCommon','search/searchPaging','file','restricted/invoker','restricted/reflet','utilityFunctionsImpl','restricted/scriptArguments','restricted/ajaxHelpers','restricted/xmlHelpers','restricted/exampleBridge','restricted/msgRouterBridge','restricted/queryApiBridge','restricted/bridge','restricted/scriptSessionContext','restricted/scriptWorkQueueContext','restricted/remoteApiBridge','restricted/scriptDeploymentContext','restricted/scriptSessionObjectService','restricted/clientScriptHandler','restricted/recordRemoteApiBridge','restricted/fieldClientScriptHandler','restricted/scopeRemoteApiBridge','restricted/urlApi','restricted/xmlApi','restricted/fileApi','restricted/errorApi','restricted/httpApi','restricted/csvApi','restricted/scheduledScriptApi','restricted/mapReduceApi','restricted/currencyApi','restricted/searchApi','restricted/searchTaskApi','restricted/entityDedupTaskApi','restricted/workflowTriggerTaskApi','restricted/emailApi','restricted/transactionApi','restricted/dateTimeZoneApi','restricted/marshalUtil','restricted/recordApi','record/proxy/dynamicRecord','record/proxy/deferredDynamicRecord','record/proxy/readOnlyRecord','record/proxy/dynamicSubrecord','record/proxy/deferredDynamicSubrecord','record/proxy/readOnlySubrecord','record/recordProxy','record/recordConstants','record/sublist','record/matrix','record/recordField','record/recordFieldEvent','record/recordEvent','record/relatedRecord','record/recordUtilityFunctions','record/subrecordUtilityFunctions','record/line/lineProxy','record/line/deferredDynamicLine','record/line/dynamicLine','record/line/readOnlyLine','record/line/sublistLineImpl','record/line/sublistLineBufferImpl','record/line/sublistLineImplementation','record/recordService','record/modelController','record/sublistLine','record/sublistLineEvent','record/recordCache','record/recordCacheController','record/model','record/modelEvent','record/metadata','record/metadataEvent','record/fieldLevelMetadata','record/fieldLevelMetadataEvent','record/sublistLevelMetadata','record/sublistLevelMetadataEvent','record/recordStateController','record/recordStateControllerEvent','record/fieldState','record/fieldStateEvent','record/sublistState','record/sublistStateEvent','record/sublistLineState','record/sublistLineStateEvent','record/recordImplementation','record/dynamicRecordImpl','record/deferredDynamicRecordImpl','record/recordScriptingScope','record/recordImplV1','record/recordImplV1Util','record/legacyNLObjects','record/subrecordController','record/subrecordImplV1Util','record/selectFieldOptionTextCache','domCurrentRecord','currentRecord/currentSublist','currentRecord/currentField','currentRecord/currentSubrecord'],devonly:['N/errorHandlerTestApi','N/exampleApi']});if(typeof(nlapi)==='undefined'||!nlapi)nlapi={};nlapi.async=(function(){var origSetTimeout=window.setTimeout;var origSetInterval=window.setInterval;var msgRouter=null;require.forceSync(true);require.setInternal(true);try
+{require(['N/msgRouter'],function(module){msgRouter=module;});}
+finally
+{require.forceSync(false);require.setInternal(false);}
+function prepareForAsync(options)
+{window.setTimeout=function setTimeout(func,delay){return origSetTimeout(function(){var timeoutArgs=Array.prototype.slice.call(arguments[1],2);prepareForAsyncCall(func,arguments[0],timeoutArgs);},delay,options,arguments);};window.setInterval=function setInterval(func,delay){return origSetInterval(function(){var timeoutArgs=Array.prototype.slice.call(arguments[1],2);prepareForAsyncCall(func,arguments[0],timeoutArgs);},delay,options,arguments);};}
+function prepareForAsyncCall(func,options,timeoutArgs)
+{var origScriptId=window.NLScriptId;if(options.hasOwnProperty("id"))
+{window.NLScriptId=options.id;makeAsyncCall.apply(options.record,[func,timeoutArgs,origScriptId,options]);}
+else
+{var moduleInfo=options.info;var version=options.version;window.NLScriptId=moduleInfo.scriptId;if(version==="2.0")
+{require.setInternal(true);try
+{require(['N/restricted/reflet'],function(reflet){reflet.recoverScript(moduleInfo);makeAsyncCall.apply(options.record,[func,timeoutArgs,origScriptId,options]);});}
+finally
+{require.setInternal(false);}}
+else
+{makeAsyncCall.apply(options.record,[func,timeoutArgs,origScriptId,options]);}}}
+function makeAsyncCall(func,args,origScriptId,options)
+{if(msgRouter)msgRouter.pushQueue(this);try
+{if(window.isRUMEnabled)
+{window.NLRUM.clientScriptAsyncCallbackBegin(options.trigger,options.hasOwnProperty("id")?options.id:options.info.scriptId);}
+if(util.isString(func))
+{if(func.indexOf("(")>0)
+{eval(func);}
+else
+{var argParams="";for(var i=0;i<args.length;i++)
+argParams+=(i>0?", ":"")+(args[i]===null||typeof(args[i])==="undefined"?"null":!util.isString(args[i])?args[i]:"'"+args[i]+"'");eval(func+"("+argParams+")");}}
+else if(typeof(func)==='function')
+{func.apply(null,args);}
+if(window.isRUMEnabled)
+{window.NLRUM.clientScriptAsyncCallbackEnd(options.trigger,options.hasOwnProperty("id")?options.id:options.info.scriptId,options.args,options.hasOwnProperty("version")?options.version:"1.0",typeof(nlapiGetRecordType)==='function'?nlapiGetRecordType():null);}}
+finally
+{window.NLScriptId=origScriptId;if(msgRouter)msgRouter.popQueue();}}
+function unloadAsync()
+{window.setTimeout=origSetTimeout;window.setInterval=origSetInterval;}
+return{prepareForAsync:prepareForAsync,unloadAsync:unloadAsync};})();window._N_define=define;define=undefined;
